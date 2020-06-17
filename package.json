@@ -8,8 +8,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "autolinker": "^3.14.1",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "emoji-js": "^3.4.0",
+    "escape-goat": "^3.0.0",
+    "msgdown": "^1.0.2",
+    "v-tooltip": "^2.0.1",
+    "vue": "^2.6.11",
+    "vue-js-modal": "^2.0.0-rc.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",
