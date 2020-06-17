@@ -7,7 +7,7 @@ export default [
   },
   {
     type: "text",
-    author: `mattmezza`,
+    author: `mbps`,
     id: 1,
     data: { text: `What do you need salsa for?` },
   },
@@ -19,7 +19,7 @@ export default [
   },
   {
     type: "text",
-    author: `mattmezza`,
+    author: `mbps`,
     id: 3,
     data: {
       text: `You know why? Because people like to say 'salsa.' 'Excuse me, do you have salsa?' 'We need more salsa.' 'Where is the salsa? No salsa?'`,
@@ -35,7 +35,7 @@ export default [
   },
   {
     type: "text",
-    author: `mattmezza`,
+    author: `mbps`,
     id: 5,
     data: {
       text: `Don't you know the difference between seltzer and salsa?? You have the seltezer after the salsa!`,
@@ -47,9 +47,9 @@ export default [
     id: 6,
     data: { text: `See, this should be a show. This is the show. ` },
   },
-  { type: "text", author: `mattmezza`, id: 7, data: { text: `What?` } },
+  { type: "text", author: `mbps`, id: 7, data: { text: `What?` } },
   { type: "text", author: `me`, id: 8, data: { text: `This. Just talking.` } },
-  { type: "text", author: `mattmezza`, id: 9, data: { text: `Yeah, right.` } },
+  { type: "text", author: `mbps`, id: 9, data: { text: `Yeah, right.` } },
   {
     type: "text",
     author: `me`,
@@ -58,12 +58,12 @@ export default [
   },
   {
     type: "text",
-    author: `mattmezza`,
+    author: `mbps`,
     id: 11,
     data: { text: `Just talking? Well what's the show about?` },
   },
   { type: "text", author: `me`, id: 12, data: { text: `It's about nothing.` } },
-  { type: "text", author: `mattmezza`, id: 100, data: { text: `No story?` } },
+  { type: "text", author: `mbps`, id: 100, data: { text: `No story?` } },
   {
     type: "system",
     id: 13,
@@ -80,7 +80,7 @@ export default [
       text: `No forget the story. `,
       file: {
         name: "awesome",
-        url: "https://media.giphy.com/media/dkGhBWE3SyzXW/giphy.gif",
+        url: "https://github.com/lqwangxg/resources/blob/master/gif/happy.gif?raw=true",
       },
     },
   },
@@ -92,7 +92,7 @@ export default [
       text: `What about this one instead?? `,
       file: {
         url:
-          "http://www.quickmeme.com/img/2d/2d95cc80f9a2a2578a8f632eebecddcc1c12e5b08ab85f81a5d401670d5f36c1.jpg",
+          "https://github.com/lqwangxg/resources/blob/master/animals/wolf.png?raw=true",
       },
       meta: "✓✓ Read",
     },

@@ -158,7 +158,7 @@ export default {
     }
   },
   watch: {
-    editMessageId(m) {
+    editMessageId() {
       if (store.editMessage != null && store.editMessage != undefined) {
         this.$refs.userInput.focus()
         this.$refs.userInput.textContent = store.editMessage.data.text
@@ -256,7 +256,7 @@ export default {
         )
       }
     },
-    _editText(event) {
+    _editText() {
       const text = this.$refs.userInput.textContent
       if (text && text.length) {
         this.$emit('edit', {

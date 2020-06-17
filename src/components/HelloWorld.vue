@@ -18,6 +18,7 @@
       :showTypingIndicator="showTypingIndicator"
       :showEdition="true"
       :showDeletion="true"
+      title=""
       :titleImageUrl="titleImageUrl"
       @onType="handleOnType"
       @edit="editMessage"
@@ -58,7 +59,7 @@ export default {
     return {
       participants: chatParticipants,
       titleImageUrl:
-        'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
+        'https://github.com/lqwangxg/resources/blob/master/animals/yongo2.png?raw=true',
       messageList: messageHistory,
       newMessagesCount: 0,
       isChatOpen: false,

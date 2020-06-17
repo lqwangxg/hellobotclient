@@ -1,17 +1,22 @@
 export default [
   {
-    id: 'mattmezza',
-    name: 'Matteo',
-    imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
+    id: 'mbps',
+    name: 'MBPS',
+    imageUrl: 'https://github.com/lqwangxg/resources/blob/master/animals/gorilla.png?raw=true'
   },
   {
     id: 'support',
     name: 'Support',
-    imageUrl: 'https://avatars3.githubusercontent.com/u/37018832?s=200&v=4'
+    imageUrl: 'https://raw.githubusercontent.com/lqwangxg/resources/master/animals/awk.png'
   },
   {
-    id: 'ChatBot',
+    id: 'chatbot',
     name: 'ChatBot',
-    imageUrl: 'https://avatars3.githubusercontent.com/u/37018832?s=200&v=4'
+    imageUrl: 'https://github.com/lqwangxg/resources/blob/master/chatbot.png?raw=true'
+  },
+  {
+    id: 'lqwangxg',
+    name: '王',
+    imageUrl: 'https://github.com/lqwangxg/resources/blob/master/animals/tiger2.png?raw=true'
   }
 ]
