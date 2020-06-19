@@ -59,8 +59,9 @@ export default {
     messageHistory: {
       type: Array
     },
-    availableColors:{
-      type: Array
+    themeColors:{
+      type: Object,
+      required: true
     }
   },
   data() {
@@ -113,7 +114,7 @@ export default {
       this.isChatOpen = false
     },
     setColor(color) {
-      this.colors = this.availableColors[color]
+      this.colors = this.themeColors[color]
       this.chosenColor = color
     },
     showStylingInfo() {

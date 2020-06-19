@@ -4,22 +4,26 @@
     <web-chat 
     :participants="participants" 
     :messageHistory="messageHistory" 
-    :availableColors="availableColors"/>
+    :themeColors="availableColors"/>
   </div>
 </template>
 
 <script>
+import webChat from '../vue_chat_plugin/webChat'
 import chatParticipants from '../data/chatProfiles'
-import messageHistory from '../data/messageHistory'
-import availableColors from '../data/colors'
+import History from '../data/messageHistory'
+import Colors from '../data/colors'
 
 export default {
   name: 'App',
+  components:{
+    webChat
+  },
   data() {
     return {
       participants:chatParticipants,
-      messageHistory:messageHistory,
-      availableColors:availableColors
+      messageHistory:History,
+      availableColors:Colors
     }
   }
 }
