@@ -1,17 +1,26 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <web-chat 
+    :participants="participants" 
+    :messageHistory="messageHistory" 
+    :availableColors="availableColors"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+import chatParticipants from '../data/chatProfiles'
+import messageHistory from '../data/messageHistory'
+import availableColors from '../data/colors'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      participants:chatParticipants,
+      messageHistory:messageHistory,
+      availableColors:availableColors
+    }
   }
 }
 </script>

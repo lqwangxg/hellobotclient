@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <beautiful-chat 
+    <Launcher 
       :alwaysScrollToBottom="alwaysScrollToBottom"
       :close="closeChat"
       :colors="colors"
@@ -40,32 +40,38 @@
       <template v-slot:system-message-body="{ message }">
         [System]: {{message.text}}
       </template>
-    </beautiful-chat>
+    </Launcher>
   </div>
 </template>
 
 <script>
-
-import messageHistory from './messageHistory'
-import chatParticipants from './chatProfiles'
-import availableColors from './colors'
+import Launcher from './Launcher.vue'
 
 export default {
-  name: 'HelloWorld',
+  components: {
+    Launcher
+  },
   props: {
-    msg: String
+    participants: {
+      type: Array,
+      required: true
+    },
+    messageHistory: {
+      type: Array
+    },
+    availableColors:{
+      type: Array
+    }
   },
   data() {
     return {
-      participants: chatParticipants,
       titleImageUrl:
         'https://github.com/lqwangxg/resources/blob/master/animals/yongo2.png?raw=true',
-      messageList: messageHistory,
+      messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,
       showTypingIndicator: '',
       colors: null,
-      availableColors,
       chosenColor: null,
       alwaysScrollToBottom: true,
       messageStyling: true,
@@ -74,6 +80,7 @@ export default {
   },
   created() {
     this.setColor('blue')
+    this.messageList = this.messageHistory? this.messageHistory:[]
   },
   methods: {
     sendMessage(text) {

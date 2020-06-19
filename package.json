@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --hot --port 4321 --open",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build ",
+    "buildwc": "vue-cli-service build --target wc-async vue_chat_plugin/*.vue",
+    "buildchat": "vue-cli-service build --target wc vue_chat_plugin/webChat.vue",
+    "buildlib": "vue-cli-service build --target lib --name web_chat_plugin vue_chat_plugin/index.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
