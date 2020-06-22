@@ -1,24 +1,24 @@
 <template>
   <div >
     <Launcher 
-      :alwaysScrollToBottom="alwaysScrollToBottom"
+      :always-scroll-to-bottom="alwaysScrollToBottom"
       :close="closeChat"
       :colors="colors"
-      :isOpen="isChatOpen"
-      :messageList="messageList"
-      :messageStyling="messageStyling"
-      :newMessagesCount="newMessagesCount"
-      :onMessageWasSent="onMessageWasSent"
+      :is-open="isChatOpen"
+      :message-list="messageList"
+      :message-styling="messageStyling"
+      :new-messages-count="newMessagesCount"
+      :on-message-was-sent="onMessageWasSent"
       :open="openChat"
       :participants="participants"
-      :showCloseButton="true"
-      :showLauncher="true"
-      :showEmoji="true"
-      :showFile="true"
+      :show-close-button="true"
+      :show-launcher="true"
+      :show-emoji="false"
+      :show-file="false"
       :showTypingIndicator="showTypingIndicator"
       :showEdition="true"
       :showDeletion="true"
-      title=""
+      :title="title"
       :titleImageUrl="titleImageUrl"
       @onType="handleOnType"
       @edit="editMessage"
@@ -46,6 +46,7 @@
 
 <script>
 import Launcher from './Launcher.vue'
+import client from './client.js'
 
 export default {
   components: {
@@ -66,6 +67,7 @@ export default {
   },
   data() {
     return {
+      title:'',
       titleImageUrl:
         'https://github.com/lqwangxg/resources/blob/master/animals/yongo2.png?raw=true',
       messageList: [],
@@ -76,26 +78,89 @@ export default {
       chosenColor: null,
       alwaysScrollToBottom: true,
       messageStyling: true,
-      userIsTyping: false
+      userIsTyping: false,
+      chatbot: client,
+      userid:''
     }
   },
   created() {
     this.setColor('blue')
+    //this.messageList = []
     this.messageList = this.messageHistory? this.messageHistory:[]
   },
   methods: {
-    sendMessage(text) {
-      if (text.length > 0) {
+    onConnected:function( ){
+      this.chat_connected = true;
+      const message = {
+        type: "system",
+        data: {
+          text: this.userid + '様がサーバに接続できました。'
+        }
+      }
+      this.title="ようこそ、" + this.userid +"様"; 
+      console.log(message);
+      
+      this.chatbot.sendEvent({
+        name: 'connected'
+      });
+      this.messageList.push(message);//頭から追加
+    },
+    onDisConnected:function( ){
+      this.chat_connected = false;
+      console.log({
+        message: 'ネットワークが切断されました。',
+        type: 'error'
+      });
+    },
+    onReceived:function(event, message){
+      console.log(" onReceived======>event:", event, " messagedetails:", message)
+      if(message.type==="message"){
+        message.type="text"
+      }
+      this.convertMessage(message);
+      this.messageList.push(message);
+    },
+    convertMessage(msg) {
+      if(msg.text){
+        msg.data = {text: msg.text};
+      }
+      if(msg.user && !msg.author){
+        msg.author = msg.user;
+      }
+      if(msg.quick_replies){
+        msg.suggestions=msg.quick_replies.map(x=> x.payload)
+        
+        //Object.assign(msg.suggestions, msg.quick_replies) 
+      }
+      return msg;
+    },
+    onMessageSent:function(event, msg){
+      if(msg.data.match(/^clear|cls|クリア|ｸﾘｱ$/i)){
+        this.messageList.length = 0;
+        while(this.messageList.length>0){
+          this.messageList.shift();//削除でクリア
+        }
+      }
+    },
+    onQuickReply:function(payload){
+      console.log(payload);
+      this.chatbot.quickReply(payload);
+    }, 
+    sendMessage(msg) {
+        let message ={
+          text: msg.data.text,
+          user: this.userid,
+          reply_user: "bot",
+        }
+        Object.assign(message, msg)
+        console.log("sendMessage=================", message);
+        this.chatbot.send(message, null);      
         this.newMessagesCount = this.isChatOpen
           ? this.newMessagesCount
           : this.newMessagesCount + 1
-        this.onMessageWasSent({
-          author: 'support',
-          type: 'text',
-          id: Math.random(),
-          data: { text }
-        })
-      }
+
+        //this.onMessageWasSent(message)
+      
     },
     handleTyping(text) {
       this.showTypingIndicator =
@@ -105,10 +170,14 @@ export default {
     },
     onMessageWasSent(message) {
       this.messageList = [...this.messageList, Object.assign({}, message, {id: Math.random()})]
+      console.log("onMessageWasSent=================??????:", message);
+      this.sendMessage(message);
     },
     openChat() {
+      console.log("openChat==============-")
       this.isChatOpen = true
       this.newMessagesCount = 0
+      this.chatbot.connect(this.userid);
     },
     closeChat() {
       this.isChatOpen = false
@@ -162,6 +231,15 @@ export default {
   },
   mounted(){
     this.messageList.forEach(x=>x.liked = false);
+
+    this.userid = Math.random().toString().substr(2,6);
+    this.chatbot.element = this;
+    this.chatbot.on('disconnected', this.onDisConnected);
+    this.chatbot.on('connected', this.onConnected);
+    this.chatbot.on('message', this.onReceived);
+    this.chatbot.on('text', this.onReceived);
+    //this.chatbot.on('system', this.onSystemMessageReceived);
+    //this.chatbot.on('sent', this.onMessageSent);
   }
 }
 </script>
