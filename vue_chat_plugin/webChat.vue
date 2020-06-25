@@ -107,10 +107,14 @@ export default {
     },
     onDisConnected:function( ){
       this.chat_connected = false;
-      console.log({
-        message: 'ネットワークが切断されました。',
-        type: 'error'
-      });
+      const message ={
+        data: {
+          text: 'ネットワークが切断されました。'
+        },
+        type: 'system'
+      }
+      console.log(message);
+      this.messageList.push(message);//頭から追加
     },
     onReceived:function(event, message){
       console.log(" onReceived======>event:", event, " messagedetails:", message)
