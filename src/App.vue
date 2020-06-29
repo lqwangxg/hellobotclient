@@ -1,32 +1,35 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <web-chat 
-    :participants="participants" 
-    :messageHistory="messageHistory" 
-    :themeColors="availableColors"/>
+    <web-chat
+      :participants="participants"
+      :messageHistory="messageHistory"
+      :themeColors="availableColors"
+    />
   </div>
 </template>
 
 <script>
-import webChat from '../vue_chat_plugin/webChat'
-import chatParticipants from '../data/chatProfiles'
-import History from '../data/messageHistory'
-import Colors from '../data/colors'
+import webChat from "../vue_chat_plugin/webChat";
+import chatParticipants from "../data/chatProfiles";
+import History from "../data/messageHistory";
+import Colors from "../data/colors";
 
 export default {
-  name: 'App',
-  components:{
+  name: "App",
+  components: {
     webChat
   },
   data() {
     return {
-      participants:chatParticipants,
-      messageHistory:History,
-      availableColors:Colors
-    }
-  }
-}
+      participants: chatParticipants,
+      messageHistory: History,
+      availableColors: Colors
+    };
+  },
+  mounted: function() {
+    this.default_user = "admin";
+  },
+};
 </script>
 
 <style>

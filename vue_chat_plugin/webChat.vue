@@ -53,6 +53,9 @@ export default {
     Launcher
   },
   props: {
+    username:{
+      type:String
+    },
     participants: {
       type: Array,
       required: true
@@ -84,6 +87,7 @@ export default {
     }
   },
   created() {
+    this.userid = this.username;
     this.setColor('blue')
     //this.messageList = []
     this.messageList = this.messageHistory? this.messageHistory:[]
@@ -224,6 +228,9 @@ export default {
     }
   },
   computed: {
+    isAdmin(){
+      return this.userid==="admin"
+    },
     linkColor() {
       return this.chosenColor === 'dark'
         ? this.colors.sentMessage.text
@@ -236,7 +243,10 @@ export default {
   mounted(){
     this.messageList.forEach(x=>x.liked = false);
 
-    this.userid = Math.random().toString().substr(2,6);
+    //this.userid = Math.random().toString().substr(2,6);
+    if(!this.userid){
+      this.userid = Math.random().toString().substr(2,6);
+    }
     this.chatbot.element = this;
     this.chatbot.on('disconnected', this.onDisConnected);
     this.chatbot.on('connected', this.onConnected);

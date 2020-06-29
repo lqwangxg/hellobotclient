@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vue-cli-service serve --hot --port 4321 --open",
     "build": "vue-cli-service build ",
+    "buildme": "vue-cli-service build --target lib --name webchat --inline-vue",
     "buildwc": "vue-cli-service build --target wc-async vue_chat_plugin/*.vue",
     "buildchat": "vue-cli-service build --target wc vue_chat_plugin/webChat.vue",
     "buildlib": "vue-cli-service build --target lib --name web_chat_plugin vue_chat_plugin/index.js",
