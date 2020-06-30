@@ -66,6 +66,9 @@ export default {
     themeColors:{
       type: Object,
       required: true
+    },
+    ws_url:{
+      type: String
     }
   },
   data() {
@@ -137,7 +140,6 @@ export default {
       }
       if(msg.quick_replies){
         msg.suggestions=msg.quick_replies.map(x=> x.payload)
-        
         //Object.assign(msg.suggestions, msg.quick_replies) 
       }
       return msg;
@@ -185,7 +187,7 @@ export default {
       console.log("openChat==============-")
       this.isChatOpen = true
       this.newMessagesCount = 0
-      this.chatbot.connect(this.userid);
+      this.chatbot.connect(this.userid, this.ws_url);
     },
     closeChat() {
       this.isChatOpen = false

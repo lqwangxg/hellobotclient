@@ -123,7 +123,7 @@ export default {
         });
 
     },
-    connect: function (userid) {
+    connect: function (userid, ws_url) {
 
         var that = this;
         if (!userid) {
@@ -139,6 +139,9 @@ export default {
         };
         console.log("client connect :",userid)
         // connect to the chat server!
+        if(ws_url){
+          that.config.ws_url = ws_url.replace("http","ws");
+        }
         if (that.options.use_sockets) {
             that.connectWebsocket(that.config.ws_url);
         } else {

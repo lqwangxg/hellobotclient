@@ -1,9 +1,10 @@
 <template>
   <div id="app">
     <web-chat
-      :participants="participants"
-      :messageHistory="messageHistory"
       :themeColors="availableColors"
+      :ws_url="chat_server_ws_url"
+      :participants="participants"
+      :username="username"
     />
   </div>
 </template>
@@ -16,6 +17,14 @@ import Colors from "../data/colors";
 
 export default {
   name: "App",
+  props: {
+    username:{
+      type:String
+    },
+    ws_url:{
+      type: String
+    }
+  },
   components: {
     webChat
   },
@@ -29,6 +38,15 @@ export default {
   mounted: function() {
     this.default_user = "admin";
   },
+  computed: {
+    chat_server_ws_url() {
+      let url = "http://localhost:3000/";
+      if(this.ws_url){
+        url = this.ws_url;
+      }
+      return url;
+    }
+  }
 };
 </script>
 
