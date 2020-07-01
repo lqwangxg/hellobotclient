@@ -19,9 +19,6 @@ import Colors from "../data/colors";
 export default {
   name: "App",
   props: {
-    username:{
-      type:String
-    },
     ws_url:{
       type: String
     }
@@ -46,6 +43,9 @@ export default {
         url = this.ws_url;
       }
       return url;
+    },
+    username() {
+      return this.$route.params.username;
     }
   }
 };

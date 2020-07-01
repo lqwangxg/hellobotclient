@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Index from '@/view/chat'
+import chat from '@/view/chat'
 
 Vue.use(Router)
 
@@ -9,27 +9,22 @@ export default new Router({
     {
       path: '/',
       name: 'index',
-      component: Index
+      component: chat
     },
-    // {
-    //   path: '/record/:id',
-    //   name: 'record',
-    //   component: Record
-    // },
-    // {
-    //   path: '/conservation',
-    //   name: 'conservation',
-    //   component: Conservation
-    // },
-    // {
-    //   path: '/log',
-    //   name: 'log',
-    //   component: Log
-    // },
-    // {
-    //   path: '*',
-    //   name: 'error',
-    //   component: Error
-    // }
+    {
+      path: '/user/',
+      name: 'user',
+      component: chat
+    },
+    {
+      path: '/:username',
+      name: 'user',
+      component: chat
+    },
+    {
+      path: '/user/:username',
+      name: 'user',
+      component: chat
+    }
   ]
 })
