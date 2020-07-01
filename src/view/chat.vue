@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="chat">
     <router-view/>
     <web-chat
       :themeColors="availableColors"
@@ -15,11 +15,9 @@ import webChat from "../vue_chat_plugin/webChat";
 import chatParticipants from "../data/chatProfiles";
 import History from "../data/messageHistory";
 import Colors from "../data/colors";
-import dotenv from 'dotenv'
-dotenv.config()
 
 export default {
-  name: "App",
+  name: "chat",
   props: {
     ws_url:{
       type: String
@@ -35,12 +33,15 @@ export default {
       availableColors: Colors
     };
   },
+  
   computed: {
     chat_server_ws_url() {
-      let url = process.env.CHATBOT_WS_URL;
+      let url = this.$WS_URL;
+      console.log("chatserver_url====>:", url);
       if(this.ws_url){
         url = this.ws_url;
       }
+      
       return url;
     },
     username() {
