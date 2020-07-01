@@ -15,6 +15,8 @@ import webChat from "../vue_chat_plugin/webChat";
 import chatParticipants from "../data/chatProfiles";
 import History from "../data/messageHistory";
 import Colors from "../data/colors";
+import dotenv from 'dotenv'
+dotenv.config()
 
 export default {
   name: "App",
@@ -33,12 +35,9 @@ export default {
       availableColors: Colors
     };
   },
-  mounted: function() {
-    this.default_user = "admin";
-  },
   computed: {
     chat_server_ws_url() {
-      let url = "http://localhost:3000/";
+      let url = process.env.CHATBOT_WS_URL;
       if(this.ws_url){
         url = this.ws_url;
       }
