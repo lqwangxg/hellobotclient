@@ -128,7 +128,7 @@ export default {
 
 <style scoped>
 .sc-message-list {
-  height: 80%;
+  height: 70%;
   overflow-y: auto;
   background-size: 100%;
   padding: 40px 0px;

@@ -147,6 +147,9 @@ export default {
     showDeletion: {
       type: Boolean,
       required: true
+    },
+    isMessageCenter: {
+      type: Boolean
     }
   },
   data() {

@@ -3,12 +3,13 @@
     <table style="padding-top: 5px;">
       <tbody>
         <tr v-for="user in participants" :key="user.id">
-          <td style="text-align: center;">
-            <img :src="user.imageUrl" class="img-msg" />
-          </td>
-          <td class="user-element" :style="{color: userListColor.userList.text}">
-            {{ user.name }}
-          </td>
+           
+            <td style="text-align: center;">
+              <img :src="user.imageUrl" class="img-msg"  @click="onSelect(user)"/>
+            </td>
+            <td class="user-element" :style="{color: userListColor.userList.text}">
+              <el-link type="primary" :underline="false"  @click="onSelect(user)">{{ user.name }}</el-link>
+            </td>
         </tr>
       </tbody>
     </table>
@@ -36,6 +37,12 @@ export default {
         }
       }
       return Object.assign(defaultColors, this.colors)
+    }
+  },
+  methods:{
+    onSelect(user){
+      console.log("clicked user:", user);
+      this.$emit("userClick",user);
     }
   }
 }
