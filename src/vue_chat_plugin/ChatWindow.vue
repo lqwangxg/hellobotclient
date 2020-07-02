@@ -166,6 +166,7 @@ export default {
   },
   methods: {
     handleUserListToggle(showUserList) {
+      if(!this.isMessageCenter) return false;
       this.showUserList = showUserList
     },
     getSuggestions() {

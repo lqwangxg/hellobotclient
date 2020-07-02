@@ -56,7 +56,8 @@ export default {
     messageList: {
       type: Array,
       default: () => []
-    }
+    },
+
   },
   components: {
     MessageList,
@@ -81,8 +82,8 @@ export default {
         ? this.messages[this.messages.length - 1].suggestions
         : [];
     },
-    onUserInputSubmit() {
-      console.log("onUserInputSubmit");
+    onUserInputSubmit(text) {
+      console.log("onUserInputSubmit", text);
     }
   }
 };

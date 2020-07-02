@@ -19,7 +19,7 @@
           <UserList :colors="availableColors" :participants="participants" @userClick="userClick" />
         </el-aside>
         <el-main>
-          <message-window />
+          <message-window :messageList="messageList" />
         </el-main>
       </el-container>
 
@@ -33,15 +33,10 @@ import Colors from "../data/colors";
 import chatParticipants from "../data/chatProfiles";
 import UserList from "../vue_chat_plugin/UserList";
 import messageWindow from "../vue_chat_plugin/messageWindow";
+import client from '../vue_chat_plugin/client.js'
 
 export default {
   name: "MessageCenter",
-  props: {
-    messageList: {
-      type: Array,
-      default: () => []
-    }
-  },
   components: {
     UserList,
     messageWindow
@@ -49,14 +44,28 @@ export default {
   data() {
     return {
       participants: chatParticipants,
-      availableColors: Colors.blue
+      availableColors: Colors.blue,
+      chatbot: client,
+      messageList: [],
     };
+  },
+  mounted() {
+    this.chatbot.element = this;
+    this.chatbot.on('disconnected', this.onDisConnected);
+    this.chatbot.on('connected', this.onConnected);
+    this.chatbot.on('message', this.onReceived);
+    this.chatbot.on('text', this.onReceived);
+
+    this.chatbot.connect(this.$MMC_UID, this.$WS_URL);
   },
   computed: {
     messages() {
       let messages = this.messageList;
 
       return messages;
+    },
+    chat_server_ws_url() {
+      return this.$WS_URL;
     }
   },
   methods: {
@@ -68,10 +77,141 @@ export default {
         ? this.messages[this.messages.length - 1].suggestions
         : [];
     },
-    onUserInputSubmit() {
-      console.log("onUserInputSubmit");
+    onUserInputSubmit(payload) {
+      this.chatbot.quickReply(payload);
     },
-    onMessageWasSent() {}
+    onConnected:function( ){
+      this.chat_connected = true;
+      const message = {
+        type: "system",
+        data: {
+          text: this.userid + '様がサーバに接続できました。'
+        }
+      }
+      this.title="ようこそ、" + this.userid +"様"; 
+      console.log(message);
+      
+      this.chatbot.sendEvent({
+        name: 'connected'
+      });
+      this.messageList.push(message);//頭から追加
+    },
+    onDisConnected:function( ){
+      this.chat_connected = false;
+      const message ={
+        data: {
+          text: 'ネットワークが切断されました。'
+        },
+        type: 'system'
+      }
+      console.log(message);
+      this.messageList.push(message);//頭から追加
+    },
+    onReceived:function(event, message){
+      console.log(" onReceived======>event:", event, " messagedetails:", message)
+      if(message.type==="message"){
+        message.type="text"
+      }
+      this.convertMessage(message);
+      this.messageList.push(message);
+    },
+    convertMessage(msg) {
+      if(msg.text){
+        msg.data = {text: msg.text};
+      }
+      if(msg.user && !msg.author){
+        msg.author = msg.user;
+      }
+      if(msg.quick_replies){
+        msg.suggestions=msg.quick_replies.map(x=> x.payload)
+        //Object.assign(msg.suggestions, msg.quick_replies) 
+      }
+      return msg;
+    },
+    onMessageSent:function(event, msg){
+      if(msg.data.match(/^clear|cls|クリア|ｸﾘｱ$/i)){
+        this.messageList.length = 0;
+        while(this.messageList.length>0){
+          this.messageList.shift();//削除でクリア
+        }
+      }
+    },
+    onQuickReply:function(payload){
+      console.log(payload);
+      this.chatbot.quickReply(payload);
+    }, 
+    sendMessage(msg) {
+        let message ={
+          text: msg.data.text,
+          user: this.userid,
+          reply_user: "bot",
+        }
+        Object.assign(message, msg)
+        console.log("sendMessage=================", message);
+        this.chatbot.send(message, null);      
+        this.newMessagesCount = this.isChatOpen
+          ? this.newMessagesCount
+          : this.newMessagesCount + 1
+
+        //this.onMessageWasSent(message)
+      
+    },
+    handleTyping(text) {
+      this.showTypingIndicator =
+        text.length > 0
+          ? this.participants[this.participants.length - 1].id
+          : ''
+    },
+    onMessageWasSent(message) {
+      this.messageList = [...this.messageList, Object.assign({}, message, {id: Math.random()})]
+      console.log("onMessageWasSent=================??????:", message);
+      this.sendMessage(message);
+    },
+    openChat() {
+      console.log("openChat==============-")
+      this.isChatOpen = true
+      this.newMessagesCount = 0
+      this.chatbot.connect(this.userid, this.ws_url);
+    },
+    closeChat() {
+      this.isChatOpen = false
+    },
+    setColor(color) {
+      this.colors = this.themeColors[color]
+      this.chosenColor = color
+    },
+    showStylingInfo() {
+      this.$modal.show('dialog', {
+        title: 'Info',
+        text:
+          'You can use *word* to <strong>boldify</strong>, /word/ to <em>emphasize</em>, _word_ to <u>underline</u>, `code` to <code>write = code;</code>, ~this~ to <del>delete</del> and ^sup^ or ¡sub¡ to write <sup>sup</sup> and <sub>sub</sub>'
+      })
+    },
+    messageStylingToggled(e) {
+      this.messageStyling = e.target.checked
+    },
+    handleOnType() {
+      this.$root.$emit('onType')
+      this.userIsTyping = true
+    },
+    editMessage(message){
+      const m = this.messageList.find(m => m.id === message.id);
+      m.isEdited = true;
+      m.data.text = message.data.text;
+    },
+    removeMessage(message){
+      if (confirm('Delete?')){
+        const m = this.messageList.find(m => m.id === message.id);
+        m.type = 'system';
+        m.data.text = 'This message has been removed';
+      }
+    },
+    like(id){
+      const m = this.messageList.findIndex(m => m.id === id);
+      var msg = this.messageList[m];
+      msg.liked = !msg.liked;
+      this.$set(this.messageList, m, msg);
+    }
   }
 };
 </script>

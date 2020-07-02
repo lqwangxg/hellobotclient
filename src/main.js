@@ -17,6 +17,7 @@ Vue.use(VTooltip)
 Vue.directive("drag", drag);
 
 Vue.prototype.$WS_URL = config.WS_URL;
+Vue.prototype.$MMC_UID = config.MMC_UID;
 console.log("config",config);
 
 
