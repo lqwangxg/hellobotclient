@@ -1,25 +1,22 @@
 <template>
   <div id="messageCenter">
-    <el-container>
+    <el-container style="height: 550px; border: 1px solid #eee">
       <el-header>
         <el-row>
           <el-col :span="12" class="chat-header">
-            <div >MBP Smartec ChatBot Control Center.</div>
+            <div>MBP Smartec ChatBot Control Center.</div>
           </el-col>
-          <el-col :span="8">
-            <div ></div>
-          </el-col>
-          <el-col :span="4">
-            <div >匿名客</div>
+          <el-col :span="12">
+            <div>{{title}}</div>
           </el-col>
         </el-row>
       </el-header>
       <el-container>
-        <el-aside width="200px">
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
           <UserList :colors="availableColors" :participants="participants" @userClick="userClick" />
         </el-aside>
         <el-main>
-          <message-window :messageList="messageList" />
+          <message-window :messageList="messages" @sendMessage="sendMessage" />
         </el-main>
       </el-container>
 
@@ -33,8 +30,11 @@ import Colors from "../data/colors";
 import chatParticipants from "../data/chatProfiles";
 import UserList from "../vue_chat_plugin/UserList";
 import messageWindow from "../vue_chat_plugin/messageWindow";
-import client from '../vue_chat_plugin/client.js'
-
+import client from "../vue_chat_plugin/client.js";
+import GuestIcon from "../vue_chat_plugin/assets/guest.png";
+import InfoIcon from "../vue_chat_plugin/assets/information.png";
+import ChatUser from "../vue_chat_plugin/ChatUser.js";
+import ChatMessage from "../vue_chat_plugin/ChatMessage.js";
 export default {
   name: "MessageCenter",
   components: {
@@ -46,178 +46,171 @@ export default {
       participants: chatParticipants,
       availableColors: Colors.blue,
       chatbot: client,
-      messageList: [],
+      title: "",
+      currentChatId:"",
+      currentUser: {},
+      mmcUser: new ChatUser(this.$MMC_UID, this.$MMC_UID, InfoIcon),
+      guestImageUrl: GuestIcon,
+      mmcImageUrl: InfoIcon
     };
+  },
+  created(){
+    this.participants.push(this.mmcUser);
   },
   mounted() {
     this.chatbot.element = this;
-    this.chatbot.on('disconnected', this.onDisConnected);
-    this.chatbot.on('connected', this.onConnected);
-    this.chatbot.on('message', this.onReceived);
-    this.chatbot.on('text', this.onReceived);
-
-    this.chatbot.connect(this.$MMC_UID, this.$WS_URL);
+    this.chatbot.on("disconnected", this.onDisConnected);
+    this.chatbot.on("connected", this.onConnected);
+    this.chatbot.on("hello", this.onGuestOnline);
+    this.chatbot.on("message", this.onReceived);
+    this.chatbot.on("event", this.onReceived);
+    this.chatbot.on("text", this.onReceived);
+    this.chatbot.connect(this.mmcUser.id, this.$WS_URL);
   },
   computed: {
     messages() {
-      let messages = this.messageList;
-
-      return messages;
+      if(!this.currentUser.messageList){
+        return [];
+      }
+      return this.currentUser.messageList;
     },
-    chat_server_ws_url() {
-      return this.$WS_URL;
-    }
+    me(){
+      return this.mmcUser;
+    },
   },
   methods: {
     userClick(user) {
-      console.log("drag user clicked:", user);
+      this.currentChatId = user.id;
+      this.currentUser = this.participants.find(u=> u.id === user.id);
     },
-    getSuggestions() {
-      return this.messages.length > 0
-        ? this.messages[this.messages.length - 1].suggestions
-        : [];
-    },
-    onUserInputSubmit(payload) {
-      this.chatbot.quickReply(payload);
-    },
-    onConnected:function( ){
-      this.chat_connected = true;
-      const message = {
-        type: "system",
-        data: {
-          text: this.userid + '様がサーバに接続できました。'
-        }
-      }
-      this.title="ようこそ、" + this.userid +"様"; 
-      console.log(message);
-      
-      this.chatbot.sendEvent({
-        name: 'connected'
-      });
-      this.messageList.push(message);//頭から追加
-    },
-    onDisConnected:function( ){
-      this.chat_connected = false;
-      const message ={
-        data: {
-          text: 'ネットワークが切断されました。'
-        },
-        type: 'system'
-      }
-      console.log(message);
-      this.messageList.push(message);//頭から追加
-    },
-    onReceived:function(event, message){
-      console.log(" onReceived======>event:", event, " messagedetails:", message)
-      if(message.type==="message"){
-        message.type="text"
-      }
-      this.convertMessage(message);
-      this.messageList.push(message);
-    },
-    convertMessage(msg) {
-      if(msg.text){
-        msg.data = {text: msg.text};
-      }
-      if(msg.user && !msg.author){
-        msg.author = msg.user;
-      }
-      if(msg.quick_replies){
-        msg.suggestions=msg.quick_replies.map(x=> x.payload)
-        //Object.assign(msg.suggestions, msg.quick_replies) 
-      }
-      return msg;
-    },
-    onMessageSent:function(event, msg){
-      if(msg.data.match(/^clear|cls|クリア|ｸﾘｱ$/i)){
-        this.messageList.length = 0;
-        while(this.messageList.length>0){
-          this.messageList.shift();//削除でクリア
-        }
-      }
-    },
-    onQuickReply:function(payload){
-      console.log(payload);
-      this.chatbot.quickReply(payload);
-    }, 
-    sendMessage(msg) {
-        let message ={
-          text: msg.data.text,
-          user: this.userid,
-          reply_user: "bot",
-        }
-        Object.assign(message, msg)
-        console.log("sendMessage=================", message);
-        this.chatbot.send(message, null);      
-        this.newMessagesCount = this.isChatOpen
-          ? this.newMessagesCount
-          : this.newMessagesCount + 1
 
-        //this.onMessageWasSent(message)
+    onConnected: function() {
+      this.chat_connected = true;
+      let message = {
+        type: "system",
+        user: this.mmcUser.id,
+        text: this.mmcUser.name + "様がサーバに接続できました。"
+      };
+      console.log("onConnected====>", message);
       
+      this.title = "ようこそ、" + this.mmcUser.name + "様";
+      this.showMessage(message);
+      this.currentUser = this.mmcUser;
     },
-    handleTyping(text) {
-      this.showTypingIndicator =
-        text.length > 0
-          ? this.participants[this.participants.length - 1].id
-          : ''
+    onDisConnected: function() {
+      this.chat_connected = false;
+      let message = {
+        type: "system",
+        user: this.mmcUser.id,
+        text: "ネットワークが切断されました。"
+      };
+      console.log("onDisConnected====>", message);
+      this.showMessage(message);
     },
-    onMessageWasSent(message) {
-      this.messageList = [...this.messageList, Object.assign({}, message, {id: Math.random()})]
-      console.log("onMessageWasSent=================??????:", message);
-      this.sendMessage(message);
+    onReceived: function(event, message) {
+      console.log("onReceived====>event:", event, ", message:", message);
+
+      this.showMessage(message);
     },
-    openChat() {
-      console.log("openChat==============-")
-      this.isChatOpen = true
-      this.newMessagesCount = 0
-      this.chatbot.connect(this.userid, this.ws_url);
+    onGuestOnline: function(event, message) {
+      message.type = "system";
+      message.text = message.user + "様がサーバに接続できました。";
+      console.log("onGuestOnline====>", message);
+
+      this.showMessage(message);
     },
-    closeChat() {
-      this.isChatOpen = false
+    sendMessage(message) {
+      this.showMessage(message);
+      console.log("sendMessage======:", message);
+      this.chatbot.send(message);
     },
-    setColor(color) {
-      this.colors = this.themeColors[color]
-      this.chosenColor = color
-    },
-    showStylingInfo() {
-      this.$modal.show('dialog', {
-        title: 'Info',
-        text:
-          'You can use *word* to <strong>boldify</strong>, /word/ to <em>emphasize</em>, _word_ to <u>underline</u>, `code` to <code>write = code;</code>, ~this~ to <del>delete</del> and ^sup^ or ¡sub¡ to write <sup>sup</sup> and <sub>sub</sub>'
-      })
-    },
-    messageStylingToggled(e) {
-      this.messageStyling = e.target.checked
-    },
-    handleOnType() {
-      this.$root.$emit('onType')
-      this.userIsTyping = true
-    },
-    editMessage(message){
-      const m = this.messageList.find(m => m.id === message.id);
-      m.isEdited = true;
-      m.data.text = message.data.text;
-    },
-    removeMessage(message){
-      if (confirm('Delete?')){
-        const m = this.messageList.find(m => m.id === message.id);
-        m.type = 'system';
-        m.data.text = 'This message has been removed';
+    showMessage(message) {
+      let msg = new ChatMessage(message);
+
+      if(this.mmcUser.mine(msg)){
+        this.mmcUser.push(msg);
+        if(this.currentUser.author != this.mmcUser.id){
+          this.mmcUser.newMessageCount++;
+        }
+        return;
+      }
+      
+      const userid =this.getAuthor(msg);
+      let userinfo = this.participants.find(u => u.id === userid);
+      if (!userinfo) {
+        userinfo = new ChatUser(userid, userid, this.guestImageUrl);
+        this.participants.push(userinfo);
+      }
+      if (!userinfo.messageList) {
+        userinfo.messageList = [];
+      }
+      userinfo.messageList.push(msg);
+      if(this.currentUser.author != userinfo.author){
+        userinfo.newMessageCount++;
       }
     },
-    like(id){
-      const m = this.messageList.findIndex(m => m.id === id);
-      var msg = this.messageList[m];
-      msg.liked = !msg.liked;
-      this.$set(this.messageList, m, msg);
+    getAuthor(msg){
+      if( msg.author && msg.author !="bot") return msg.author;
+      if( msg.reply_user && msg.reply_user !="bot") return msg.reply_user;
+      
+      return msg.author;
     }
+    // //=============================================
+    // //ここから下は削除予定
+    // //=============================================
+    // getSuggestions() {
+    //   return this.messages.length > 0
+    //     ? this.messages[this.messages.length - 1].suggestions
+    //     : [];
+    // },
+    // handleTyping(text) {
+    //   this.showTypingIndicator =
+    //     text.length > 0
+    //       ? this.participants[this.participants.length - 1].id
+    //       : ''
+    // },
+    // setColor(color) {
+    //   this.colors = this.themeColors[color]
+    //   this.chosenColor = color
+    // },
+    // showStylingInfo() {
+    //   this.$modal.show('dialog', {
+    //     title: 'Info',
+    //     text:
+    //       'You can use *word* to <strong>boldify</strong>, /word/ to <em>emphasize</em>, _word_ to <u>underline</u>, `code` to <code>write = code;</code>, ~this~ to <del>delete</del> and ^sup^ or ¡sub¡ to write <sup>sup</sup> and <sub>sub</sub>'
+    //   })
+    // },
+    // messageStylingToggled(e) {
+    //   this.messageStyling = e.target.checked
+    // },
+    // handleOnType() {
+    //   this.$root.$emit('onType')
+    //   this.userIsTyping = true
+    // },
+    // editMessage(message){
+    //   const m = this.messageList.find(m => m.id === message.id);
+    //   m.isEdited = true;
+    //   m.data.text = message.data.text;
+    // },
+    // removeMessage(message){
+    //   if (confirm('Delete?')){
+    //     const m = this.messageList.find(m => m.id === message.id);
+    //     m.type = 'system';
+    //     m.data.text = 'This message has been removed';
+    //   }
+    // },
+    // like(id){
+    //   const m = this.messageList.findIndex(m => m.id === id);
+    //   var msg = this.messageList[m];
+    //   msg.liked = !msg.liked;
+    //   this.$set(this.messageList, m, msg);
+    // }
   }
 };
 </script>
 
 <style>
-.chat-header{
+.chat-header {
   text-align: left;
 }
 .el-header,
@@ -237,21 +230,18 @@ export default {
   background-color: #d3dce6;
   color: #333;
   text-align: center;
-}
-.el-tabs {
-  width: 100%;
-  height: 100%;
-}
-.el-main {
-  background-color: #e9eef3;
-  color: #333;
-  text-align: center;
-  line-height: 100px;
   height: 550px;
-  border: 1px solid #eee;
 }
 
-body > .el-container {
-  margin-bottom: 40px;
+.el-main {
+  background-color: #efeff3;
+  color: #333;
+  text-align: center;
+  line-height: 50px;
+  border: 1px solid #eee;
+  height: 100%;
+}
+#messageCenter{
+  height: 550px;
 }
 </style>

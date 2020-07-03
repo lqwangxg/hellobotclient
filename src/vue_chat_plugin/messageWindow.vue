@@ -1,6 +1,6 @@
 <template>
   <div id="messageCenter">
-    <MessageList
+    <MessageList class="MessageList"
       :messages="messages"
       :participants="participants"
       :show-typing-indicator="''"
@@ -82,13 +82,17 @@ export default {
         ? this.messages[this.messages.length - 1].suggestions
         : [];
     },
-    onUserInputSubmit(text) {
-      console.log("onUserInputSubmit", text);
+    onUserInputSubmit(message) {
+      console.log("onUserInputSubmit", message);
+      this.$emit("sendMessage", message);
     }
   }
 };
 </script>
 <style>
+.MessageList{
+  height: 300px;
+}
 #messageCenter{
   width: 100%;
   height: 100%;

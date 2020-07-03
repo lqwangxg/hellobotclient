@@ -2,13 +2,14 @@
   <div class="user-list" :style="{background: userListColor.userList.bg}">
     <table style="padding-top: 5px;">
       <tbody>
-        <tr v-for="user in participants" :key="user.id">
-           
+        <tr v-for="user in showUserList" :key="user.id">
             <td style="text-align: center;">
-              <img :src="user.imageUrl" class="img-msg"  @click="onSelect(user)"/>
+              <img :src="user.imageUrl" class="img-msg"  @click="onSelect(user)"/>              
             </td>
             <td class="user-element" :style="{color: userListColor.userList.text}">
-              <el-link type="primary" :underline="false"  @click="onSelect(user)">{{ user.name }}</el-link>
+              <el-badge :value="user.newMessageCount" :hidden="user.newMessageCount<1">
+                <el-link type="primary" :underline="false"  @click="onSelect(user)">{{ user.name }}</el-link>
+              </el-badge>
             </td>
         </tr>
       </tbody>
@@ -37,11 +38,14 @@ export default {
         }
       }
       return Object.assign(defaultColors, this.colors)
+    },
+    showUserList(){
+      return this.participants.filter(user => !user.hidden)
     }
   },
   methods:{
     onSelect(user){
-      console.log("clicked user:", user);
+      user.newMessageCount = 0;
       this.$emit("userClick",user);
     }
   }
@@ -50,10 +54,10 @@ export default {
 
 <style scoped>
 .user-list {
-  height: 100%;
+  height: 98%;
   overflow: auto;
   padding-left: 5px;
-  padding-top: 8px;
+  padding-top: 10px;
 }
 .img-msg {
   border-radius: 50%;
@@ -64,4 +68,5 @@ export default {
   font-size: 20px;
   vertical-align: middle;
 }
+
 </style>

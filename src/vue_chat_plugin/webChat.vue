@@ -8,7 +8,7 @@
       :message-list="messageList"
       :message-styling="messageStyling"
       :new-messages-count="newMessagesCount"
-      :on-message-was-sent="onMessageWasSent"
+      :on-message-was-sent="sendMessage"
       :open="openChat"
       :participants="participants"
       :show-close-button="true"
@@ -47,6 +47,7 @@
 <script>
 import Launcher from './Launcher.vue'
 import client from './client.js'
+import ChatMessage from './ChatMessage.js'
 
 export default {
   components: {
@@ -86,7 +87,8 @@ export default {
       messageStyling: true,
       userIsTyping: false,
       chatbot: client,
-      userid:''
+      userid:'',
+      guestImageUrl:"./assets/guest.png"
     }
   },
   created() {
@@ -100,77 +102,37 @@ export default {
       this.chat_connected = true;
       const message = {
         type: "system",
-        data: {
-          text: this.userid + '様がサーバに接続できました。'
-        }
+        user: this.userid,
+        text: this.userid + '様がサーバに接続できました。'
       }
+      let msg = new ChatMessage(message);
+
       this.title="ようこそ、" + this.userid +"様"; 
-      console.log(message);
+      console.log(msg);
       
       this.chatbot.sendEvent({
         name: 'connected'
       });
-      this.messageList.push(message);//頭から追加
+      this.messageList.push(msg);//頭から追加
     },
     onDisConnected:function( ){
       this.chat_connected = false;
       const message ={
-        data: {
-          text: 'ネットワークが切断されました。'
-        },
-        type: 'system'
+        type: "system",
+        user: this.userid,
+        text: "ネットワークが切断されました。"
       }
-      console.log(message);
-      this.messageList.push(message);//頭から追加
+      let msg = new ChatMessage(message);
+      console.log(msg);
+      this.messageList.push(msg);//頭から追加
     },
     onReceived:function(event, message){
       console.log(" onReceived======>event:", event, " messagedetails:", message)
       if(message.type==="message"){
         message.type="text"
       }
-      this.convertMessage(message);
-      this.messageList.push(message);
-    },
-    convertMessage(msg) {
-      if(msg.text){
-        msg.data = {text: msg.text};
-      }
-      if(msg.user && !msg.author){
-        msg.author = msg.user;
-      }
-      if(msg.quick_replies){
-        msg.suggestions=msg.quick_replies.map(x=> x.payload)
-        //Object.assign(msg.suggestions, msg.quick_replies) 
-      }
-      return msg;
-    },
-    onMessageSent:function(event, msg){
-      if(msg.data.match(/^clear|cls|クリア|ｸﾘｱ$/i)){
-        this.messageList.length = 0;
-        while(this.messageList.length>0){
-          this.messageList.shift();//削除でクリア
-        }
-      }
-    },
-    onQuickReply:function(payload){
-      console.log(payload);
-      this.chatbot.quickReply(payload);
-    }, 
-    sendMessage(msg) {
-        let message ={
-          text: msg.data.text,
-          user: this.userid,
-          reply_user: "bot",
-        }
-        Object.assign(message, msg)
-        console.log("sendMessage=================", message);
-        this.chatbot.send(message, null);      
-        this.newMessagesCount = this.isChatOpen
-          ? this.newMessagesCount
-          : this.newMessagesCount + 1
-
-        //this.onMessageWasSent(message)
-      
+      let msg = new ChatMessage(message);      
+      this.messageList.push(msg);
     },
     handleTyping(text) {
       this.showTypingIndicator =
@@ -178,10 +140,10 @@ export default {
           ? this.participants[this.participants.length - 1].id
           : ''
     },
-    onMessageWasSent(message) {
-      this.messageList = [...this.messageList, Object.assign({}, message, {id: Math.random()})]
-      console.log("onMessageWasSent=================??????:", message);
-      this.sendMessage(message);
+    sendMessage(message) {
+      this.messageList = [...this.messageList, Object.assign({}, message)]
+      console.log("sendMessage======:", message);
+      this.chatbot.send(message);
     },
     openChat() {
       console.log("openChat==============-")
@@ -253,9 +215,8 @@ export default {
     this.chatbot.on('disconnected', this.onDisConnected);
     this.chatbot.on('connected', this.onConnected);
     this.chatbot.on('message', this.onReceived);
+    this.chatbot.on('event', this.onReceived);    
     this.chatbot.on('text', this.onReceived);
-    //this.chatbot.on('system', this.onSystemMessageReceived);
-    //this.chatbot.on('sent', this.onMessageSent);
   }
 }
 </script>

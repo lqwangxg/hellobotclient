@@ -89,7 +89,7 @@ export default {
       })
     },
     me() {
-      return this.message.author === 'me'
+      return this.message.author === this.$MMC_UID
     },
     isEditing() {
       return (store.editMessage && store.editMessage.id) == this.message.id

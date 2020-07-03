@@ -5,7 +5,7 @@
 // import showdown from "showdown"
 // var converter = new showdown.Converter();
 // converter.setOption('openLinksInNewWindow', true);
-
+import ChatMessage from "./ChatMessage.js";
 export default {
   config: {
     ws_url:
@@ -65,30 +65,29 @@ export default {
       xmlhttp.send(JSON.stringify(body));
     });
   },
+  
   send: function(msg, e) {
     var that = this;
     if (e) e.preventDefault();
     if (!msg) {
       return;
     }
+
     if (typeof msg === "string") {
       msg = { text: msg };
     }
 
-    var message = {
+    var message = new ChatMessage({
       type: "message",
+      text: msg.data.text? msg.data.text: msg.text, 
       user: that.current_user.id,
       user_profile: that.current_user,
       channel: this.options.use_sockets
         ? { type: "socket", id: that.current_user.id }
         : { type: "webhook", id: that.current_user.id },
-    };
-
-    Object.assign(message, msg);
+    });
 
     that.deliverMessage(message);
-    that.trigger("sent", message);
-
     return false;
   },
   deliverMessage: function(message) {
@@ -147,7 +146,7 @@ export default {
       id: userid,
       timezone_offset: new Date().getTimezoneOffset(),
     };
-    console.log("client connect :", userid);
+    //console.log("client connect :", userid);
 
     // connect to the chat server!
     if (ws_url) {
@@ -164,7 +163,6 @@ export default {
     var connectEvent = "hello";
     if (this.getCookie("botkit_guid")) {
       that.guid = this.getCookie("botkit_guid");
-      connectEvent = "welcome_back";
     } else {
       that.guid = that.generate_guid();
       this.setCookie("botkit_guid", that.guid, 1);
@@ -190,24 +188,24 @@ export default {
     var connectEvent = "hello";
     if (this.getCookie("botkit_guid")) {
       that.guid = this.getCookie("botkit_guid");
-      connectEvent = "welcome_back";
     }
 
     if (this.options.enable_history) {
       that.getHistory();
     }
-    console.log("ws_url:", ws_url);
+    //console.log("ws_url:", ws_url);
     // Connection opened
     that.socket.addEventListener("open", function(event) {
       console.log("CONNECTED TO SOCKET");
       that.reconnect_count = 0;
       that.trigger("connected", event);
-      that.deliverMessage({
+      let msg = new ChatMessage({
         type: connectEvent,
         user: that.current_user.id,
         channel: "socket",
         user_profile: that.current_user ? that.current_user : null,
       });
+      that.deliverMessage(msg);
     });
 
     that.socket.addEventListener("error", function(event) {
@@ -236,12 +234,10 @@ export default {
         that.trigger("socket_error", err);
         return;
       }
-
-      that.trigger(message.type, message);
+      let msg = new ChatMessage(message);
+      console.log("addEventListener==message=> ",msg);
+      that.trigger(message.type, msg);
     });
-  },
-  quickReply: function(payload) {
-    this.send(payload);
   },
   sendEvent: function(event) {
     if (this.parent_window) {

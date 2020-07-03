@@ -203,7 +203,7 @@ export default {
       })
     },
     _submitSuggestion(suggestion) {
-      this.onSubmit({author: 'me', type: 'text', data: {text: suggestion}})
+      this.onSubmit({author: this.$MMC_UID, type: 'text', data: {text: suggestion}})
     },
     _checkSubmitSuccess(success) {
       if (Promise !== undefined) {
@@ -229,7 +229,7 @@ export default {
         if (text && text.length > 0) {
           this._checkSubmitSuccess(
             this.onSubmit({
-              author: 'me',
+              author: this.$MMC_UID,
               type: 'text',
               data: {text}
             })
@@ -241,7 +241,7 @@ export default {
       if (text && text.length > 0) {
         this._checkSubmitSuccess(
           this.onSubmit({
-            author: 'me',
+            author: this.$MMC_UID,
             type: 'file',
             data: {text, file}
           })
@@ -249,7 +249,7 @@ export default {
       } else {
         this._checkSubmitSuccess(
           this.onSubmit({
-            author: 'me',
+            author: this.$MMC_UID,
             type: 'file',
             data: {file}
           })
@@ -260,7 +260,7 @@ export default {
       const text = this.$refs.userInput.textContent
       if (text && text.length) {
         this.$emit('edit', {
-          author: 'me',
+          author: this.$MMC_UID,
           type: 'text',
           id: store.editMessage.id,
           data: {text}
@@ -271,7 +271,7 @@ export default {
     _handleEmojiPicked(emoji) {
       this._checkSubmitSuccess(
         this.onSubmit({
-          author: 'me',
+          author: this.$MMC_UID,
           type: 'emoji',
           data: {emoji}
         })
@@ -294,7 +294,6 @@ export default {
   position: relative;
   bottom: 0;
   display: flex;
-  background-color: #f4f7f9;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   transition: background-color 0.2s ease, box-shadow 0.2s ease;

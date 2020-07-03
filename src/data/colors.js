@@ -75,7 +75,7 @@ export default {
       text: '#222222'
     },
     userInput: {
-      bg: '#f4f7f9',
+      bg: '#e4ffff',
       text: '#565867'
     },
     userList: {

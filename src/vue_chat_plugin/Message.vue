@@ -3,14 +3,14 @@
     <div
       class="sc-message--content"
       :class="{
-        sent: message.author === 'me',
-        received: message.author !== 'me' && message.type !== 'system',
+        sent: message.author === mmc_uid,
+        received: message.author !== mmc_uid && message.type !== 'system',
         system: message.type === 'system'
       }"
     >
       <slot name="user-avatar" :message="message" :user="user">
         <div
-          v-if="message.type !== 'system' && authorName && authorName !== 'me'"
+          v-if="message.type !== 'system' && authorName && authorName !== mmc_uid"
           v-tooltip="authorName"
           :title="authorName"
           class="sc-message--avatar"
@@ -106,6 +106,9 @@ export default {
     }
   },
   computed: {
+    mmc_uid(){
+      return this.$MMC_UID;
+    },
     authorName() {
       return this.user && this.user.name
     },
@@ -113,7 +116,7 @@ export default {
       return (this.user && this.user.imageUrl) || chatIcon
     },
     messageColors() {
-      return this.message.author === 'me' ? this.sentColorsStyle : this.receivedColorsStyle
+      return this.message.author === this.mmc_uid ? this.sentColorsStyle : this.receivedColorsStyle
     },
     receivedColorsStyle() {
       return {
@@ -133,7 +136,7 @@ export default {
 
 <style lang="scss">
 .sc-message {
-  width: 300px;
+  min-width: 300px;
   margin: auto;
   padding-bottom: 10px;
   display: flex;
@@ -191,6 +194,7 @@ export default {
   border-radius: 6px;
   font-weight: 300;
   font-size: 14px;
+  text-align:left;
   line-height: 1.4;
   position: relative;
   -webkit-font-smoothing: subpixel-antialiased;
