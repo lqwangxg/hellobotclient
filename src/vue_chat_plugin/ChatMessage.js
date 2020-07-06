@@ -45,5 +45,11 @@ export default class ChatMessage {
     }
   }
 
+  addChatGroup = function(id){
+    if(this.data.group.includes(id)){
+      return;
+    }
+    this.data.group.push(id);
+  }
   
 }

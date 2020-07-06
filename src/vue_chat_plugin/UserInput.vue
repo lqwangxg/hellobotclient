@@ -306,10 +306,9 @@ export default {
 }
 
 .sc-user-input--text {
-  width: 300px;
-  resize: none;
-  border: none;
+  width: 98%;
   outline: none;
+  text-align: left;
   border-bottom-left-radius: 10px;
   box-sizing: border-box;
   padding: 18px;
