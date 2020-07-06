@@ -48,7 +48,7 @@
 import Launcher from './Launcher.vue'
 import client from './client.js'
 import ChatMessage from './ChatMessage.js'
-
+import store from './store/'
 export default {
   components: {
     Launcher
@@ -74,6 +74,7 @@ export default {
   },
   data() {
     return {
+      store,
       title:'',
       titleImageUrl:
         'https://github.com/lqwangxg/resources/blob/master/animals/yongo2.png?raw=true',
@@ -87,27 +88,42 @@ export default {
       messageStyling: true,
       userIsTyping: false,
       chatbot: client,
-      userid:'',
       guestImageUrl:"./assets/guest.png"
     }
   },
   created() {
-    this.userid = this.username;
+    if(!this.store.currentUser){
+      this.store.currentUser = {}
+    }
+    let userid =this.username;
+    if(!userid){
+      userid = Math.random().toString().substr(2,6);
+    }
+    this.store.currentUser.id = userid;
     this.setColor('blue')
     //this.messageList = []
     this.messageList = this.messageHistory? this.messageHistory:[]
+  },
+  mounted(){
+    this.messageList.forEach(x=>x.liked = false);
+    this.chatbot.element = this;
+    this.chatbot.on('disconnected', this.onDisConnected);
+    this.chatbot.on('connected', this.onConnected);
+    this.chatbot.on('message', this.onReceived);
+    this.chatbot.on('event', this.onReceived);    
+    this.chatbot.on('text', this.onReceived);
   },
   methods: {
     onConnected:function( ){
       this.chat_connected = true;
       const message = {
         type: "system",
-        user: this.userid,
-        text: this.userid + '様がサーバに接続できました。'
+        user: this.store.currentUser.id,
+        text: this.store.currentUser.id + '様がサーバに接続できました。'
       }
       let msg = new ChatMessage(message);
 
-      this.title="ようこそ、" + this.userid +"様"; 
+      this.title="ようこそ、" + this.store.currentUser.id +"様"; 
       console.log(msg);
       
       this.chatbot.sendEvent({
@@ -119,7 +135,7 @@ export default {
       this.chat_connected = false;
       const message ={
         type: "system",
-        user: this.userid,
+        user: this.store.currentUser.id,
         text: "ネットワークが切断されました。"
       }
       let msg = new ChatMessage(message);
@@ -127,7 +143,6 @@ export default {
       this.messageList.push(msg);//頭から追加
     },
     onReceived:function(event, message){
-      console.log(" onReceived======>event:", event, " messagedetails:", message)
       if(message.type==="message"){
         message.type="text"
       }
@@ -142,14 +157,14 @@ export default {
     },
     sendMessage(message) {
       this.messageList = [...this.messageList, Object.assign({}, message)]
-      console.log("sendMessage======:", message);
-      this.chatbot.send(message);
+      console.log("sendMessage from User=====:", message);
+      let msg = new ChatMessage(message); 
+      this.chatbot.send(msg);
     },
     openChat() {
-      console.log("openChat==============-")
       this.isChatOpen = true
       this.newMessagesCount = 0
-      this.chatbot.connect(this.userid, this.ws_url);
+      this.chatbot.connect(this.store.currentUser.id, this.ws_url);
     },
     closeChat() {
       this.isChatOpen = false
@@ -203,20 +218,6 @@ export default {
     backgroundColor() {
       return this.chosenColor === 'dark' ? this.colors.messageList.bg : '#fff'
     }
-  },
-  mounted(){
-    this.messageList.forEach(x=>x.liked = false);
-
-    //this.userid = Math.random().toString().substr(2,6);
-    if(!this.userid){
-      this.userid = Math.random().toString().substr(2,6);
-    }
-    this.chatbot.element = this;
-    this.chatbot.on('disconnected', this.onDisConnected);
-    this.chatbot.on('connected', this.onConnected);
-    this.chatbot.on('message', this.onReceived);
-    this.chatbot.on('event', this.onReceived);    
-    this.chatbot.on('text', this.onReceived);
   }
 }
 </script>

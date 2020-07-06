@@ -16,14 +16,4 @@ export default class ChatUser {
     this.messageList.push(msg);
   }
   
-  mine(msg){
-    if( msg.author && msg.author === this.id ) return true;
-    if( msg.user && msg.user === this.id) return true;
-    if( msg.reply_user && msg.reply_user === this.id) return true;
-    if(Array.isArray(msg.groups)){
-      return msg.groups.includes(this.id);
-    }
-    return false;
-  }
-
 }

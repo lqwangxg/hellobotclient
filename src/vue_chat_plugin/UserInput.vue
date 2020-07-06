@@ -155,6 +155,12 @@ export default {
     },
     isEditing() {
       return store.editMessage && store.editMessage.id
+    },
+    currentUserId(){
+      if(!this.store.currentUser){
+        return this.$MMC_UID;
+      }
+      return this.store.currentUser.id;
     }
   },
   watch: {
@@ -203,7 +209,7 @@ export default {
       })
     },
     _submitSuggestion(suggestion) {
-      this.onSubmit({author: this.$MMC_UID, type: 'text', data: {text: suggestion}})
+      this.onSubmit({author: this.currentUserId, type: 'text', data: {text: suggestion}})
     },
     _checkSubmitSuccess(success) {
       if (Promise !== undefined) {
@@ -229,7 +235,7 @@ export default {
         if (text && text.length > 0) {
           this._checkSubmitSuccess(
             this.onSubmit({
-              author: this.$MMC_UID,
+              author: this.currentUserId,
               type: 'text',
               data: {text}
             })
@@ -241,7 +247,7 @@ export default {
       if (text && text.length > 0) {
         this._checkSubmitSuccess(
           this.onSubmit({
-            author: this.$MMC_UID,
+            author: this.currentUserId,
             type: 'file',
             data: {text, file}
           })
@@ -249,7 +255,7 @@ export default {
       } else {
         this._checkSubmitSuccess(
           this.onSubmit({
-            author: this.$MMC_UID,
+            author: this.currentUserId,
             type: 'file',
             data: {file}
           })
@@ -260,7 +266,7 @@ export default {
       const text = this.$refs.userInput.textContent
       if (text && text.length) {
         this.$emit('edit', {
-          author: this.$MMC_UID,
+          author: this.currentUserId,
           type: 'text',
           id: store.editMessage.id,
           data: {text}
@@ -271,7 +277,7 @@ export default {
     _handleEmojiPicked(emoji) {
       this._checkSubmitSuccess(
         this.onSubmit({
-          author: this.$MMC_UID,
+          author: this.currentUserId,
           type: 'emoji',
           data: {emoji}
         })

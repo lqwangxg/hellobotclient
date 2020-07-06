@@ -30,11 +30,13 @@ import Colors from "../data/colors";
 import chatParticipants from "../data/chatProfiles";
 import UserList from "../vue_chat_plugin/UserList";
 import messageWindow from "../vue_chat_plugin/messageWindow";
+import store from "../vue_chat_plugin/store/";
 import client from "../vue_chat_plugin/client.js";
 import GuestIcon from "../vue_chat_plugin/assets/guest.png";
 import InfoIcon from "../vue_chat_plugin/assets/information.png";
 import ChatUser from "../vue_chat_plugin/ChatUser.js";
 import ChatMessage from "../vue_chat_plugin/ChatMessage.js";
+
 export default {
   name: "MessageCenter",
   components: {
@@ -43,12 +45,11 @@ export default {
   },
   data() {
     return {
+      store,
       participants: chatParticipants,
       availableColors: Colors.blue,
       chatbot: client,
       title: "",
-      currentChatId:"",
-      currentUser: {},
       mmcUser: new ChatUser(this.$MMC_UID, this.$MMC_UID, InfoIcon),
       guestImageUrl: GuestIcon,
       mmcImageUrl: InfoIcon
@@ -56,6 +57,10 @@ export default {
   },
   created(){
     this.participants.push(this.mmcUser);
+    if(!this.store.currentUser){
+      this.store.currentUser = {}
+    }
+    this.store.currentUser = this.mmcUser;
   },
   mounted() {
     this.chatbot.element = this;
@@ -69,10 +74,7 @@ export default {
   },
   computed: {
     messages() {
-      if(!this.currentUser.messageList){
-        return [];
-      }
-      return this.currentUser.messageList;
+      return this.store.currentUser.messageList;
     },
     me(){
       return this.mmcUser;
@@ -80,8 +82,7 @@ export default {
   },
   methods: {
     userClick(user) {
-      this.currentChatId = user.id;
-      this.currentUser = this.participants.find(u=> u.id === user.id);
+      this.store.currentUser = this.participants.find(u=> u.id === user.id);
     },
 
     onConnected: function() {
@@ -95,7 +96,7 @@ export default {
       
       this.title = "ようこそ、" + this.mmcUser.name + "様";
       this.showMessage(message);
-      this.currentUser = this.mmcUser;
+      this.store.currentUser = this.mmcUser;
     },
     onDisConnected: function() {
       this.chat_connected = false;
@@ -108,34 +109,32 @@ export default {
       this.showMessage(message);
     },
     onReceived: function(event, message) {
-      console.log("onReceived====>event:", event, ", message:", message);
-
+      if(!message.reply_user){
+        message.reply_user = this.store.currentUser.id;
+      }
       this.showMessage(message);
     },
     onGuestOnline: function(event, message) {
       message.type = "system";
-      message.text = message.user + "様がサーバに接続できました。";
-      console.log("onGuestOnline====>", message);
-
+      message.text = this.store.currentUser.id + "様がサーバに接続できました。";
+     
       this.showMessage(message);
     },
     sendMessage(message) {
-      this.showMessage(message);
-      console.log("sendMessage======:", message);
-      this.chatbot.send(message);
+      message.author = this.mmcUser.id;
+      this.store.currentUser = this.mmcUser;
+      let msg = new ChatMessage(message);
+      this.store.currentUser.messageList.push(msg);
+      console.log("sendMessage======:", msg);
+      this.chatbot.send(msg);
     },
     showMessage(message) {
       let msg = new ChatMessage(message);
-
-      if(this.mmcUser.mine(msg)){
-        this.mmcUser.push(msg);
-        if(this.currentUser.author != this.mmcUser.id){
-          this.mmcUser.newMessageCount++;
-        }
-        return;
+      let userid = this.getAuthor(msg);
+      if(msg.isTranfering && msg.data.author){
+        userid = msg.data.author;
       }
-      
-      const userid =this.getAuthor(msg);
+      //const userid =this.getAuthor(msg);
       let userinfo = this.participants.find(u => u.id === userid);
       if (!userinfo) {
         userinfo = new ChatUser(userid, userid, this.guestImageUrl);
@@ -145,13 +144,13 @@ export default {
         userinfo.messageList = [];
       }
       userinfo.messageList.push(msg);
-      if(this.currentUser.author != userinfo.author){
+      if(this.store.currentUser.id != userinfo.id){
         userinfo.newMessageCount++;
       }
     },
     getAuthor(msg){
-      if( msg.author && msg.author !="bot") return msg.author;
       if( msg.reply_user && msg.reply_user !="bot") return msg.reply_user;
+      if( msg.author && msg.author !="bot") return msg.author;
       
       return msg.author;
     }

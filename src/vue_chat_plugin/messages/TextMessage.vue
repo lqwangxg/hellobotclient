@@ -88,8 +88,14 @@ export default {
         truncate: {length: 50, location: 'smart'}
       })
     },
+    currentUserId(){
+      if(!this.store.currentUser){
+        return this.$MMC_UID;
+      }
+      return this.store.currentUser.id;
+    },
     me() {
-      return this.message.author === this.$MMC_UID
+      return this.message.author === this.currentUserId
     },
     isEditing() {
       return (store.editMessage && store.editMessage.id) == this.message.id

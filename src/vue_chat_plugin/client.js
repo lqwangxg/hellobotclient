@@ -73,21 +73,13 @@ export default {
       return;
     }
 
-    if (typeof msg === "string") {
-      msg = { text: msg };
-    }
-
-    var message = new ChatMessage({
-      type: "message",
-      text: msg.data.text? msg.data.text: msg.text, 
-      user: that.current_user.id,
-      user_profile: that.current_user,
-      channel: this.options.use_sockets
-        ? { type: "socket", id: that.current_user.id }
-        : { type: "webhook", id: that.current_user.id },
-    });
-
-    that.deliverMessage(message);
+    msg.user = that.current_user.id,
+    msg.user_profile = that.current_user,
+    msg.channel = this.options.use_sockets
+    ? { type: "socket", id: that.current_user.id }
+    : { type: "webhook", id: that.current_user.id }
+    
+    that.deliverMessage(msg);
     return false;
   },
   deliverMessage: function(message) {

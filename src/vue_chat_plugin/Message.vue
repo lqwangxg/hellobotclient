@@ -69,7 +69,7 @@ import EmojiMessage from './messages/EmojiMessage.vue'
 import TypingMessage from './messages/TypingMessage.vue'
 import SystemMessage from './messages/SystemMessage.vue'
 import chatIcon from './assets/chat-icon.svg'
-//import store from './store/'
+import store from './store/'
 
 export default {
   components: {
@@ -105,9 +105,17 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      store
+    }
+  },
   computed: {
     mmc_uid(){
-      return this.$MMC_UID;
+      if(!this.store.currentUser){
+        return this.$MMC_UID;
+      }
+      return this.store.currentUser.id;
     },
     authorName() {
       return this.user && this.user.name
