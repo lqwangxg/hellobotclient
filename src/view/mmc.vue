@@ -3,10 +3,13 @@
     <el-container style="height: 550px; border: 1px solid #eee">
       <el-header>
         <el-row>
-          <el-col :span="12" class="chat-header">
+          <el-col :span="3" class="chat-header">
+            <img v-if="titleImageUrl" class="sc-header--img" :src="titleImageUrl" alt="" />
+          </el-col>
+          <el-col :span="9" style="text-align: left;">
             <div>MBP Smartec ChatBot Control Center.</div>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="12" style="text-align: right;">
             <div>{{title}}</div>
           </el-col>
         </el-row>
@@ -32,6 +35,7 @@ import UserList from "../vue_chat_plugin/UserList";
 import messageWindow from "../vue_chat_plugin/messageWindow";
 import store from "../vue_chat_plugin/store/";
 import client from "../vue_chat_plugin/client.js";
+import logoIcon from "../vue_chat_plugin/assets/logo.png";
 import GuestIcon from "../vue_chat_plugin/assets/guest.png";
 import InfoIcon from "../vue_chat_plugin/assets/information.png";
 import ChatUser from "../vue_chat_plugin/ChatUser.js";
@@ -52,6 +56,7 @@ export default {
       title: "",
       mmcUser: new ChatUser(this.$MMC_UID, this.$MMC_UID, InfoIcon),
       currentUser: null,
+      titleImageUrl: logoIcon,
       guestImageUrl: GuestIcon,
       mmcImageUrl: InfoIcon
     };
@@ -157,6 +162,9 @@ export default {
       if (msg.author && msg.author != "bot") return msg.author;
 
       return msg.author;
+    },
+    onClose(){
+      //処理なし
     }
     // //=============================================
     // //ここから下は削除予定
@@ -246,5 +254,11 @@ export default {
 }
 #messageCenter {
   height: 550px;
+}
+
+.sc-header--img {
+  border-radius: 50%;
+  align-self: center;
+  padding: 10px;
 }
 </style>

@@ -48,6 +48,7 @@
 import Launcher from './Launcher.vue'
 import client from './client.js'
 import ChatMessage from './ChatMessage.js'
+import logoIcon from "./assets/logo.png";
 import store from './store/'
 export default {
   components: {
@@ -76,8 +77,7 @@ export default {
     return {
       store,
       title:'',
-      titleImageUrl:
-        'https://github.com/lqwangxg/resources/blob/master/animals/yongo2.png?raw=true',
+      titleImageUrl: logoIcon,
       messageList: [],
       newMessagesCount: 0,
       isChatOpen: false,
