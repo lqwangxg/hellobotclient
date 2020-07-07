@@ -22,7 +22,7 @@
           <message-window :messageList="messages" @sendMessage="sendMessage" />
         </el-main>
       </el-container>
-      <el-footer>Copyright © 2019-2024 Company Co. All rights reserved</el-footer>
+      <el-footer>Copyright © MBPSMARTEC株式会社 All rights reserved</el-footer>
     </el-container>
   </div>
 </template>

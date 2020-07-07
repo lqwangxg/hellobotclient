@@ -96,10 +96,6 @@ export default {
       type: Object,
       required: true
     },
-    mmc_uid: {
-      type: String,
-      default: "information"
-    },
     showEdition: {
       type: Boolean,
       required: true
@@ -115,6 +111,13 @@ export default {
     }
   },
   computed: {
+    
+    mmc_uid() {
+      if(this.store.currentUser){
+        return this.store.currentUser.id;
+      }
+      return this.$MMC_UID;
+    },
     authorName() {
       return this.user && this.user.name
     },

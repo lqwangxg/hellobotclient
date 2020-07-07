@@ -76,7 +76,6 @@ export default {
         : [];
     },
     onUserInputSubmit(message) {
-      console.log("onUserInputSubmit", message);
       this.$emit("sendMessage", message);
     }
   }
