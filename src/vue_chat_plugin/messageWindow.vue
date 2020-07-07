@@ -1,11 +1,12 @@
 <template>
   <div id="messageCenter">
-    <MessageList class="MessageList"
-      :messages="messages"
+    <MessageList
+      class="MessageList"
+      :messages="messageList"
       :participants="participants"
       :show-typing-indicator="''"
       :colors="availableColors"
-      :always-scroll-to-bottom="false"
+      :always-scroll-to-bottom="true"
       :show-edition="true"
       :show-deletion="true"
       :message-styling="false"
@@ -56,8 +57,7 @@ export default {
     messageList: {
       type: Array,
       default: () => []
-    },
-
+    }
   },
   components: {
     MessageList,
@@ -69,17 +69,10 @@ export default {
       availableColors: Colors.blue
     };
   },
-  computed: {
-    messages() {
-      let messages = this.messageList;
-
-      return messages;
-    }
-  },
   methods: {
     getSuggestions() {
-      return this.messages.length > 0
-        ? this.messages[this.messages.length - 1].suggestions
+      return this.messageList.length > 0
+        ? this.messageList[this.messageList.length - 1].suggestions
         : [];
     },
     onUserInputSubmit(message) {
@@ -90,10 +83,10 @@ export default {
 };
 </script>
 <style>
-.MessageList{
+.MessageList {
   height: 300px;
 }
-#messageCenter{
+#messageCenter {
   width: 100%;
   height: 100%;
 }

@@ -101,7 +101,6 @@ export default {
     }
     this.store.currentUser.id = userid;
     this.setColor('blue')
-    //this.messageList = []
     this.messageList = this.messageHistory? this.messageHistory:[]
   },
   mounted(){

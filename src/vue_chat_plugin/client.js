@@ -85,9 +85,17 @@ export default {
   deliverMessage: function(message) {
     console.log("deliverMessage To ChatBotServer===>", message);
     if (this.options.use_sockets) {
-      this.socket.send(JSON.stringify(message));
+      this.trySendMessage(message);
     } else {
       this.webhook(message);
+    }
+  },
+  trySendMessage:function(message){
+    if(this.socket.readyState ===1){
+      this.socket.send(JSON.stringify(message));
+      return true;
+    }else{
+      setTimeout(this.trySendMessage(message), 100);
     }
   },
   getHistory: function() {

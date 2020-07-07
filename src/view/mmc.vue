@@ -56,13 +56,6 @@ export default {
       mmcImageUrl: InfoIcon
     };
   },
-  created(){
-    this.currentUser = this.mmcUser;
-    let user = this.participants.find(u=>u.id === this.mmcUser.id);
-    if(!user){
-      this.participants.push(this.mmcUser);
-    }
-  },
   mounted() {
     this.chatbot.element = this;
     this.chatbot.on("disconnected", this.onDisConnected);
@@ -72,32 +65,35 @@ export default {
     this.chatbot.on("event", this.onReceived);
     this.chatbot.on("text", this.onReceived);
     this.chatbot.connect(this.mmcUser.id, this.$WS_URL);
+    this.currentUser = this.mmcUser;
+    let chatUser = this.participants.find(u => u.id === this.mmcUser.id);
+    if (!chatUser) {
+      this.participants.push(this.mmcUser);
+    }
   },
   computed: {
     messages() {
-      if(!this.currentUser){
-        return this.mmcUser.messageList;
+      if (this.currentUser) {
+        return this.currentUser.messageList;
       }
-      return this.currentUser.messageList;
-    },
-    me(){
-      return this.mmcUser;
-    },
+      return this.mmcUser.messageList;
+    }
   },
   methods: {
-    userClick(user) {
-      this.currentUser = this.participants.find(u=> u.id === user.id);
+    userClick(chatUser) {
+      this.currentUser = this.participants.find(u => u.id === chatUser.id);
+      this.title = "ようこそ、" + this.currentUser.name + "様";
     },
 
     onConnected: function() {
       this.chat_connected = true;
       let message = {
         type: "system",
-        user: this.mmcUser.id,
+        author: this.mmcUser.id,
         text: this.mmcUser.name + "様がサーバに接続できました。"
       };
       console.log("onConnected====>", message);
-      
+
       this.title = "ようこそ、" + this.mmcUser.name + "様";
       this.showMessage(message);
       this.currentUser = this.mmcUser;
@@ -106,14 +102,14 @@ export default {
       this.chat_connected = false;
       let message = {
         type: "system",
-        user: this.mmcUser.id,
+        author: this.mmcUser.id,
         text: "ネットワークが切断されました。"
       };
       console.log("onDisConnected====>", message);
       this.showMessage(message);
     },
     onReceived: function(event, message) {
-      if(!message.reply_user){
+      if (!message.reply_user) {
         message.reply_user = this.currentUser.id;
       }
       this.showMessage(message);
@@ -121,11 +117,11 @@ export default {
     onGuestOnline: function(event, message) {
       message.type = "system";
       let userid = message.author;
-      if(message.isTranfering && message.data.author){
+      if (message.isTranfering && message.data.author) {
         userid = message.data.author;
       }
       message.text = userid + "様がサーバに接続できました。";
-     
+
       this.showMessage(message);
     },
     sendMessage(message) {
@@ -139,7 +135,7 @@ export default {
     showMessage(message) {
       let msg = new ChatMessage(message);
       let userid = this.getAuthor(msg);
-      if(msg.isTranfering && msg.data.author){
+      if (msg.isTranfering && msg.data.author) {
         userid = msg.data.author;
       }
       //const userid =this.getAuthor(msg);
@@ -152,14 +148,14 @@ export default {
         userinfo.messageList = [];
       }
       userinfo.messageList.push(msg);
-      if(this.currentUser.id != userinfo.id){
+      if (this.currentUser.id != userinfo.id) {
         userinfo.newMessageCount++;
       }
     },
-    getAuthor(msg){
-      if( msg.reply_user && msg.reply_user !="bot") return msg.reply_user;
-      if( msg.author && msg.author !="bot") return msg.author;
-      
+    getAuthor(msg) {
+      if (msg.reply_user && msg.reply_user != "bot") return msg.reply_user;
+      if (msg.author && msg.author != "bot") return msg.author;
+
       return msg.author;
     }
     // //=============================================
@@ -248,7 +244,7 @@ export default {
   border: 1px solid #eee;
   height: 100%;
 }
-#messageCenter{
+#messageCenter {
   height: 550px;
 }
 </style>
