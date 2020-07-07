@@ -22,7 +22,6 @@
           <message-window :messageList="messages" @sendMessage="sendMessage" />
         </el-main>
       </el-container>
-
       <el-footer>Copyright © 2019-2024 Company Co. All rights reserved</el-footer>
     </el-container>
   </div>
@@ -47,6 +46,14 @@ export default {
     UserList,
     messageWindow
   },
+  props: {
+    ws_url:{
+      type: String
+    },
+    username:{
+      type: String
+    }
+  },
   data() {
     return {
       store,
@@ -54,7 +61,7 @@ export default {
       availableColors: Colors.blue,
       chatbot: client,
       title: "",
-      mmcUser: new ChatUser(this.$MMC_UID, this.$MMC_UID, InfoIcon),
+      mmcUser: null,
       currentUser: null,
       titleImageUrl: logoIcon,
       guestImageUrl: GuestIcon,
@@ -62,6 +69,13 @@ export default {
     };
   },
   mounted() {
+    this.mmcUser = new ChatUser(this.mmc_uid, this.mmc_uid, InfoIcon);
+    this.currentUser = this.mmcUser;
+    let chatUser = this.participants.find(u => u.id === this.mmcUser.id);
+    if (!chatUser) {
+      this.participants.push(this.mmcUser);
+    }
+
     this.chatbot.element = this;
     this.chatbot.on("disconnected", this.onDisConnected);
     this.chatbot.on("connected", this.onConnected);
@@ -69,19 +83,31 @@ export default {
     this.chatbot.on("message", this.onReceived);
     this.chatbot.on("event", this.onReceived);
     this.chatbot.on("text", this.onReceived);
-    this.chatbot.connect(this.mmcUser.id, this.$WS_URL);
-    this.currentUser = this.mmcUser;
-    let chatUser = this.participants.find(u => u.id === this.mmcUser.id);
-    if (!chatUser) {
-      this.participants.push(this.mmcUser);
-    }
+    this.chatbot.connect(this.mmcUser.id, this.chat_server_ws_url);
   },
   computed: {
+    chat_server_ws_url() {
+      let url = this.$WS_URL;
+      if(this.ws_url){
+        url = this.ws_url;
+      }
+      return url;
+    },
+    mmc_uid() {
+      let uid = this.$MMC_UID;
+      if(this.username){
+        uid = this.username;
+      }
+      return uid;
+    },    
     messages() {
       if (this.currentUser) {
         return this.currentUser.messageList;
       }
-      return this.mmcUser.messageList;
+      if(this.mmcUser){
+        return this.mmcUser.messageList;
+      }
+      return [];
     }
   },
   methods: {
@@ -166,56 +192,6 @@ export default {
     onClose(){
       //処理なし
     }
-    // //=============================================
-    // //ここから下は削除予定
-    // //=============================================
-    // getSuggestions() {
-    //   return this.messages.length > 0
-    //     ? this.messages[this.messages.length - 1].suggestions
-    //     : [];
-    // },
-    // handleTyping(text) {
-    //   this.showTypingIndicator =
-    //     text.length > 0
-    //       ? this.participants[this.participants.length - 1].id
-    //       : ''
-    // },
-    // setColor(color) {
-    //   this.colors = this.themeColors[color]
-    //   this.chosenColor = color
-    // },
-    // showStylingInfo() {
-    //   this.$modal.show('dialog', {
-    //     title: 'Info',
-    //     text:
-    //       'You can use *word* to <strong>boldify</strong>, /word/ to <em>emphasize</em>, _word_ to <u>underline</u>, `code` to <code>write = code;</code>, ~this~ to <del>delete</del> and ^sup^ or ¡sub¡ to write <sup>sup</sup> and <sub>sub</sub>'
-    //   })
-    // },
-    // messageStylingToggled(e) {
-    //   this.messageStyling = e.target.checked
-    // },
-    // handleOnType() {
-    //   this.$root.$emit('onType')
-    //   this.userIsTyping = true
-    // },
-    // editMessage(message){
-    //   const m = this.messageList.find(m => m.id === message.id);
-    //   m.isEdited = true;
-    //   m.data.text = message.data.text;
-    // },
-    // removeMessage(message){
-    //   if (confirm('Delete?')){
-    //     const m = this.messageList.find(m => m.id === message.id);
-    //     m.type = 'system';
-    //     m.data.text = 'This message has been removed';
-    //   }
-    // },
-    // like(id){
-    //   const m = this.messageList.findIndex(m => m.id === id);
-    //   var msg = this.messageList[m];
-    //   msg.liked = !msg.liked;
-    //   this.$set(this.messageList, m, msg);
-    // }
   }
 };
 </script>

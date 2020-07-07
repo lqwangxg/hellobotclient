@@ -140,6 +140,10 @@ export default {
     colors: {
       type: Object,
       required: true
+    },
+    mmc_uid: {
+      type: String,
+      default: "information"
     }
   },
   data() {
@@ -158,7 +162,7 @@ export default {
     },
     currentUserId(){
       if(!this.store.currentUser){
-        return this.$MMC_UID;
+        return this.mmc_uid;
       }
       return this.store.currentUser.id;
     }

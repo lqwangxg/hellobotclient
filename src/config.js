@@ -1,4 +1,4 @@
 export default {
-  WS_URL:"http://localhost:3000/",
+  WS_URL:"https://mbpsbot.herokuapp.com/",
   MMC_UID:"information"
 }

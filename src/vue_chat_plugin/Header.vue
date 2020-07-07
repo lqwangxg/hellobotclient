@@ -91,7 +91,7 @@ export default {
   padding: 10px;
   flex: 1;
   user-select: none;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .sc-header--title.enabled {

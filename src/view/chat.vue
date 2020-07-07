@@ -1,6 +1,5 @@
 <template>
   <div id="chat">
-    <router-view/>
     <web-chat
       :themeColors="availableColors"
       :ws_url="chat_server_ws_url"
@@ -19,7 +18,10 @@ import Colors from "../data/colors";
 export default {
   name: "chat",
   props: {
-    ws_url:{
+    ws_url: {
+      type: String
+    },
+    username: {
       type: String
     }
   },
@@ -33,19 +35,14 @@ export default {
       availableColors: Colors
     };
   },
-  
   computed: {
     chat_server_ws_url() {
       let url = this.$WS_URL;
       console.log("chatserver_url====>:", url);
-      if(this.ws_url){
+      if (this.ws_url) {
         url = this.ws_url;
       }
-      
       return url;
-    },
-    username() {
-      return this.$route.params.username;
     }
   }
 };
