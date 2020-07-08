@@ -235,7 +235,7 @@ export default {
         return;
       }
       let msg = new ChatMessage(message);
-      console.log("addEventListener==message=> ",msg);
+      console.log("addEventListener==event=> ",event);
       that.trigger(message.type, msg);
     });
   },

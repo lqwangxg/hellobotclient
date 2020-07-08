@@ -20,8 +20,13 @@
         ></div>
       </slot>
 
+      <FileMessage
+        v-if="message.file"
+        :data="message"
+        :message-colors="messageColors"
+      />
       <TextMessage
-        v-if="message.type === 'text'"
+        v-else-if="message.type === 'text'"
         :message="message"
         :message-colors="messageColors"
         :message-styling="messageStyling"
@@ -44,15 +49,10 @@
           </slot>
         </template>
       </TextMessage>
-      <EmojiMessage v-else-if="message.type === 'emoji'" :data="message.data" />
-      <FileMessage
-        v-else-if="message.type === 'file'"
-        :data="message.data"
-        :message-colors="messageColors"
-      />
-      <TypingMessage v-else-if="message.type === 'typing'" :message-colors="messageColors" />
+      <EmojiMessage v-if="message.type === 'emoji'" :data="message.data" />
+      <TypingMessage v-if="message.type === 'typing'" :message-colors="messageColors" />
       <SystemMessage
-        v-else-if="message.type === 'system'"
+        v-if="message.type === 'system'"
         :data="message.data"
         :message-colors="messageColors"
       >
@@ -111,7 +111,6 @@ export default {
     }
   },
   computed: {
-    
     mmc_uid() {
       if(this.store.currentUser){
         return this.store.currentUser.id;
