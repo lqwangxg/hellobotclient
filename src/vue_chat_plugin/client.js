@@ -15,7 +15,7 @@ export default {
   },
   options: {
     use_sockets: true,
-    enable_history: true
+    enable_history: false
   },
   reconnect_count: 0,
   guid: null,
