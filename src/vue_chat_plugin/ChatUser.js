@@ -4,6 +4,9 @@ export default class ChatUser {
     this.id = id;
     this.name = name;
     this.imageUrl = imageUrl;
+    this.mail ="";
+    this.telno ="";
+    this.imageUrl ="";
 
     this.messageList = [];
     this.newMessageCount = 0;

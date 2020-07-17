@@ -11,11 +11,11 @@ export default {
     ws_url:
       (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host,
     reconnect_timeout: 3000,
-    max_reconnect: 5,
-    enable_history: false,
+    max_reconnect: 5
   },
   options: {
     use_sockets: true,
+    enable_history: true
   },
   reconnect_count: 0,
   guid: null,
@@ -100,10 +100,12 @@ export default {
   },
   getHistory: function() {
     var that = this;
-    if (that.guid) {
+    if (that.current_user) {
+      var url= that.config.ws_url.replace("ws", "http")+"/botkit/history";
+      console.log("getHistory =======url:",url);
       that
-        .request("/botkit/history", {
-          user: that.guid,
+        .request(url, {
+          user: that.current_user.id,
         })
         .then(function(history) {
           if (history.success) {
