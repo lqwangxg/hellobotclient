@@ -46,8 +46,9 @@
 
 <script>
 import Launcher from './Launcher.vue'
-import client from './client.js'
-import ChatMessage from './ChatMessage.js'
+import client from './BotClient.js'
+//import client from './client.js'
+import ChatMessage from './ChatMessageObject.js'
 import logoIcon from "./assets/logo.png";
 import store from './store/'
 export default {
@@ -106,6 +107,7 @@ export default {
   mounted(){
     this.messageList.forEach(x=>x.liked = false);
     this.chatbot.element = this;
+    this.chatbot.ws_url = this.ws_url;
     this.chatbot.on('disconnected', this.onDisConnected);
     this.chatbot.on('connected', this.onConnected);
     this.chatbot.on('message', this.onReceived);
@@ -113,7 +115,7 @@ export default {
     this.chatbot.on('text', this.onReceived);
   },
   methods: {
-    onConnected:function( ){
+    onConnected:function(details){
       this.chat_connected = true;
       const message = {
         type: "system",
@@ -123,11 +125,8 @@ export default {
       let msg = new ChatMessage(message);
 
       this.title="ようこそ、" + this.store.currentUser.id +"様"; 
-      console.log(msg);
-      
-      this.chatbot.sendEvent({
-        name: 'connected'
-      });
+      console.log(msg, details);
+    
       this.messageList.push(msg);//頭から追加
     },
     onDisConnected:function( ){
@@ -145,8 +144,8 @@ export default {
       if(message.type==="message"){
         message.type="text"
       }
-      let msg = new ChatMessage(message);      
-      this.messageList.push(msg);
+      //let msg = new ChatMessage(message);      
+      this.messageList.push(message);
     },
     handleTyping(text) {
       this.showTypingIndicator =

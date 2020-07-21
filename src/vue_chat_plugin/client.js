@@ -238,6 +238,8 @@ export default {
       }
       let msg = new ChatMessage(message);
       console.log("addEventListener==event=> ",event);
+      console.log("addEventListener==message=> ",message);
+      console.log("addEventListener==msg=> ",msg);
       that.trigger(message.type, msg);
     });
   },

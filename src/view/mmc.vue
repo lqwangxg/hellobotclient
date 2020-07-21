@@ -77,7 +77,7 @@ export default {
     }
 
     this.chatbot.element = this;
-    this.chatbot.on("disconnected", this.onDisConnected);
+    this.chatbot.on("closed", this.onDisConnected);
     this.chatbot.on("connected", this.onConnected);
     this.chatbot.on("hello", this.onGuestOnline);
     this.chatbot.on("message", this.onReceived);

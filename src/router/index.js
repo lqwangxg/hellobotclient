@@ -13,6 +13,11 @@ export default new Router({
       component: chat
     },
     {
+      path: '/auth',
+      name: 'auth',
+      component: mmc
+    },
+    {
       path: '/mmc',
       name: 'mmc',
       component: mmc

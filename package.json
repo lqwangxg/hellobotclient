@@ -25,6 +25,7 @@
     "element-ui": "^2.13.2",
     "emoji-js": "^3.4.0",
     "escape-goat": "^3.0.0",
+    "line-login": "^1.0.14",
     "msgdown": "^1.0.2",
     "showdown": "^1.9.1",
     "v-tooltip": "^2.0.1",
