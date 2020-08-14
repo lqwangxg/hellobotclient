@@ -1,5 +1,6 @@
 import ChatMessage  from "./ChatMessageObject";
 import { IChatUser, ChatUser } from "./ChatUserObject";
+import { createLocalStorage } from "localstorage-ponyfill";
 
 interface IBotClient{
   connect(userid:string, ws_url: string):void;
@@ -36,7 +37,8 @@ class BotClient implements IBotClient{
   element: any = this.options.element;
   reconnect_count: number = 0;
   socket?: WebSocket;
-
+  localStorage= createLocalStorage();
+  user_profile?:ChatUser = null;
 
   constructor(options?: Options){
     Object.assign(this.options, options);
@@ -50,8 +52,9 @@ class BotClient implements IBotClient{
       this.options.userid = userid;
     }
     this.setCookie("userid", this.options.userid, 1);
+    this.user_profile = this.getUserProfile( this.options.userid);
     //TODO:ユーザーIDにより、ユーザ基本情報を取得
-
+    
     if(http_url){
       this.options.ws_url = http_url.replace("http", "ws");
     }
@@ -76,8 +79,7 @@ class BotClient implements IBotClient{
         user:  that.options.userid
       });      
       that.send(msg, event);
-      that.trigger("connected", msg);
-      
+      that.trigger("connected", msg);      
     });
 
     that.socket.addEventListener("error", function(event: Event){
@@ -102,8 +104,9 @@ class BotClient implements IBotClient{
       try {
         var message = JSON.parse(event.data);
         message.received = true;
+        //console.log("addEventListener ==message=> ", message);
         let msg = new ChatMessage(message);
-        console.log("on message received==msg=> ", msg);
+        console.log("addEventListener ==msg=> ", msg);
         that.trigger(message.type, msg);
       } catch (err) {
         that.trigger("socket_error", err);
@@ -171,7 +174,8 @@ class BotClient implements IBotClient{
   send(message: ChatMessage, event?: Event) {
     let that = this;
     if(event) event.preventDefault();
-     
+
+    message.from =message.author;
     message.user_profile = that.getUserProfile(message.author);
     if (that.options.use_sockets) {
       that.trySendMessage(message);
@@ -208,10 +212,19 @@ class BotClient implements IBotClient{
     }
   }
   
-  getUserProfile(userid: string): IChatUser{
+  getUserProfile(userid: string): ChatUser{
     if(this.options.userid){
       //localStorageへ検索
+      let userinfo = localStorage.getItem(this.options.userid);
+      if(!userinfo){
+        let ui = new ChatUser(userid);
+        localStorage.setItem("userid", JSON.stringify(ui));
+        return ui;
+      }else{
+        return JSON.parse(userinfo)
+      }
     }
+
     return new ChatUser(userid);
   }
   //==============================================

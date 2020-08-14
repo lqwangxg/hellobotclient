@@ -1,17 +1,30 @@
 <template>
   <div class="sc-message--file" :style="messageColors">
-    <div class="sc-message--file-icon">
-      <img :src="data.file.url" class="sc-image" />
-    </div>
+    
     <div class="sc-message--file-name" :style="messageColors">
-      <a :href="data.file.url ? data.file.url : '#'" target="_blank">{{ data.file.name || '' }}</a>
+      <a :href="data.file.url ? data.file.url : '#'" target="_blank">
+
+        <div v-if="data.file.imageUrl" class="sc-message--file-icon">
+          <img :src="data.file.imageUrl" class="sc-image" />
+          <div class="sc-message--file-name" :style="messageColors">
+            {{ data.file.name || data.text || "" }}
+          </div>
+        </div>
+        
+        <div v-if="data.text" class="sc-message--file-text" :style="messageColors">
+          {{ data.text}}
+        </div>
+
+        <div v-for="item in data.file.desc" :key="item" class="sc-message--file-name" :style="messageColors">
+          {{ item }}
+        </div>
+
+      </a>
     </div>
-    <div class="sc-message--file-text" :style="messageColors">
-      {{ data.text }}
-      <p v-if="data.meta" class="sc-message--meta" :style="messageColors">
-        {{ data.meta }}
-      </p>
-    </div>
+
+    <p v-if="data.meta" class="sc-message--meta" :style="messageColors">
+      {{ data.meta }}
+    </p>
   </div>
 </template>
 
@@ -39,7 +52,6 @@ export default {
   /* white-space: pre-wrap; */
   -webkit-font-smoothing: subpixel-antialiased;
 }
-
 .sc-message--content.sent .sc-message--file {
   word-wrap: break-word;
 }

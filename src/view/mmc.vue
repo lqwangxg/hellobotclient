@@ -33,12 +33,15 @@ import chatParticipants from "../data/chatProfiles";
 import UserList from "../vue_chat_plugin/UserList";
 import messageWindow from "../vue_chat_plugin/messageWindow";
 import store from "../vue_chat_plugin/store/";
-import client from "../vue_chat_plugin/client.js";
 import logoIcon from "../vue_chat_plugin/assets/logo.png";
 import GuestIcon from "../vue_chat_plugin/assets/guest.png";
 import InfoIcon from "../vue_chat_plugin/assets/information.png";
-import ChatUser from "../vue_chat_plugin/ChatUser.js";
-import ChatMessage from "../vue_chat_plugin/ChatMessage.js";
+//import client from "../vue_chat_plugin/client.js";
+//import ChatUser from "../vue_chat_plugin/ChatUser.js";
+//import ChatMessage from "../vue_chat_plugin/ChatMessage.js";
+import client from '../vue_chat_plugin/BotClient.js'
+import ChatUser from "../vue_chat_plugin/ChatUserObject.js";
+import ChatMessage from '../vue_chat_plugin/ChatMessageObject.js'
 
 export default {
   name: "MessageCenter",

@@ -22,8 +22,17 @@
         <slot name="text-message-toolbox" :message="message" :me="me"> </slot>
       </div>
     </template>
+    
     <slot :message="message" :messageText="messageText" :messageColors="messageColors" :me="me">
-      <p class="sc-message--text-content" v-html="messageText"></p>
+      <div v-if="message.url">
+        <a :href="message.url" target="_blank">
+          <p class="sc-message--text-content" v-html="messageText"></p>
+        </a> 
+      </div>
+      <div v-else>
+        <p class="sc-message--text-content" v-html="messageText"></p>
+      </div>
+
       <p v-if="message.data.meta" class="sc-message--meta" :style="{color: messageColors.color}">
         {{ message.data.meta }}
       </p>

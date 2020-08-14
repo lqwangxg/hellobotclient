@@ -2,6 +2,7 @@
 exports.__esModule = true;
 var ChatMessageObject_1 = require("./ChatMessageObject");
 var ChatUserObject_1 = require("./ChatUserObject");
+var localstorage_ponyfill_1 = require("localstorage-ponyfill");
 var BotClient = /** @class */ (function () {
     function BotClient(options) {
         this.options = {
@@ -14,6 +15,8 @@ var BotClient = /** @class */ (function () {
         };
         this.element = this.options.element;
         this.reconnect_count = 0;
+        this.localStorage = localstorage_ponyfill_1.createLocalStorage();
+        this.user_profile = null;
         Object.assign(this.options, options);
         if (this.options.http_url) {
             this.options.ws_url = this.options.http_url.replace("http", "ws");
@@ -24,6 +27,7 @@ var BotClient = /** @class */ (function () {
             this.options.userid = userid;
         }
         this.setCookie("userid", this.options.userid, 1);
+        this.user_profile = this.getUserProfile(this.options.userid);
         //TODO:ユーザーIDにより、ユーザ基本情報を取得
         if (http_url) {
             this.options.ws_url = http_url.replace("http", "ws");
@@ -70,8 +74,9 @@ var BotClient = /** @class */ (function () {
             try {
                 var message = JSON.parse(event.data);
                 message.received = true;
+                //console.log("addEventListener ==message=> ", message);
                 var msg = new ChatMessageObject_1["default"](message);
-                console.log("on message received==msg=> ", msg);
+                console.log("addEventListener ==msg=> ", msg);
                 that.trigger(message.type, msg);
             }
             catch (err) {
@@ -136,6 +141,7 @@ var BotClient = /** @class */ (function () {
         var that = this;
         if (event)
             event.preventDefault();
+        message.from = message.author;
         message.user_profile = that.getUserProfile(message.author);
         if (that.options.use_sockets) {
             that.trySendMessage(message);
@@ -174,6 +180,15 @@ var BotClient = /** @class */ (function () {
     BotClient.prototype.getUserProfile = function (userid) {
         if (this.options.userid) {
             //localStorageへ検索
+            var userinfo = localStorage.getItem(this.options.userid);
+            if (!userinfo) {
+                var ui = new ChatUserObject_1.ChatUser(userid);
+                localStorage.setItem("userid", JSON.stringify(ui));
+                return ui;
+            }
+            else {
+                return JSON.parse(userinfo);
+            }
         }
         return new ChatUserObject_1.ChatUser(userid);
     };
