@@ -94,6 +94,9 @@ export default {
   },
   computed: {
     messageText() {
+      if(!this.message.data || !this.message.data.text){
+        return "";
+      }
       let escaped = htmlEscape(this.message.data.text)
 
       return Autolinker.link(this.messageStyling ? fmt(escaped) : escaped, {

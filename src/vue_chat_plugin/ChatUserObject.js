@@ -1,12 +1,21 @@
 "use strict";
 exports.__esModule = true;
-exports.ChatUser = void 0;
 var ChatUser = /** @class */ (function () {
-    function ChatUser(user) {
-        this.username = user;
-        this.realname = user;
-        this.nickname = user;
+    function ChatUser(id, name, imageUrl) {
+        this.id = id;
+        this.username = name;
+        this.imageUrl = imageUrl;
+        this.mail = "";
+        this.telno = "";
+        this.imageUrl = "";
+        this.messageList = [];
+        this.newMessageCount = 0;
+        //参加しているChatGroup
+        this.ChatGroup = [];
     }
+    ChatUser.prototype.push = function (msg) {
+        this.messageList.push(msg);
+    };
     return ChatUser;
 }());
-exports.ChatUser = ChatUser;
+exports["default"] = ChatUser;

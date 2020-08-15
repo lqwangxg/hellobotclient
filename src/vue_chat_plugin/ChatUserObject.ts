@@ -1,27 +1,36 @@
 import ChatMessage from "./ChatMessageObject";
 
-export interface IChatUser{
+export default class ChatUser {
+  id: string;
   username: string;
-  password?: string;
+  imageUrl: string; 
   realname?: string;
   nickname?: string;
-
+  
   mail?: string;
   telno?: string;
-  imageUrl?: string;
+  
+  messageList?:Array<ChatMessage>;
+  newMessageCount?:Number;
+  ChatGroup?:Array<any>;
 
-  messageList?: Array<ChatMessage>;
-}
+  constructor(id: string , name?:string, imageUrl?:string){
+    this.id = id;
+    this.username = name;
+    this.imageUrl = imageUrl;
+    this.mail ="";
+    this.telno ="";
+    this.imageUrl ="";
 
-export class ChatUser implements IChatUser{
-  readonly username: string;
-  realname: string;
-  nickname: string;
+    this.messageList = [];
+    this.newMessageCount = 0;
 
-  constructor(user: string){
-    this.username = user;
-    this.realname = user;
-    this.nickname = user;
+    //参加しているChatGroup
+    this.ChatGroup = [];
   }
-    
+  
+  push(msg: ChatMessage){
+    this.messageList.push(msg);
+  }
+
 }

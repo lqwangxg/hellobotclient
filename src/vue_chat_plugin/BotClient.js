@@ -182,7 +182,7 @@ var BotClient = /** @class */ (function () {
             //localStorageへ検索
             var userinfo = localStorage.getItem(this.options.userid);
             if (!userinfo) {
-                var ui = new ChatUserObject_1.ChatUser(userid);
+                var ui = new ChatUserObject_1["default"](userid);
                 localStorage.setItem("userid", JSON.stringify(ui));
                 return ui;
             }
@@ -190,7 +190,7 @@ var BotClient = /** @class */ (function () {
                 return JSON.parse(userinfo);
             }
         }
-        return new ChatUserObject_1.ChatUser(userid);
+        return new ChatUserObject_1["default"](userid);
     };
     //==============================================
     /**

@@ -72,7 +72,8 @@ export default {
     };
   },
   mounted() {
-    this.mmcUser = new ChatUser(this.mmc_uid, this.mmc_uid, InfoIcon);
+    this.mmcUser = new ChatUser(this.mmc_uid,this.mmc_uid, InfoIcon);
+    
     this.currentUser = this.mmcUser;
     let chatUser = this.participants.find(u => u.id === this.mmcUser.id);
     if (!chatUser) {

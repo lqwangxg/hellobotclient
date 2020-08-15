@@ -1,5 +1,5 @@
 import ChatMessage  from "./ChatMessageObject";
-import { IChatUser, ChatUser } from "./ChatUserObject";
+import ChatUser from "./ChatUserObject";
 import { createLocalStorage } from "localstorage-ponyfill";
 
 interface IBotClient{

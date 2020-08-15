@@ -1,4 +1,4 @@
-import { IChatUser } from "./ChatUserObject";
+import  ChatUser  from "./ChatUserObject";
 type quick_reply={
   title:string,
   payload:string,
@@ -33,7 +33,7 @@ export default class ChatMessage {
 
   data?: MessageDataType;
   recipient?: string | string[];
-  user_profile?: IChatUser;
+  user_profile?: ChatUser;
 
   constructor(msg: MessageDataType) {
     this.type = msg.type ? msg.type : "message";
