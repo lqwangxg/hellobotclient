@@ -1,7 +1,9 @@
 <template>
   <div class="sc-message--system" :style="messageColors">
     <slot :message="data">
-      {{ data.text }}
+       <p v-if="data.text" :style="{color: messageColors.color}">
+        {{ data.text }}
+      </p>
       <p v-if="data.meta" class="sc-message--meta" :style="{color: messageColors.color}">
         {{ data.meta }}
       </p>

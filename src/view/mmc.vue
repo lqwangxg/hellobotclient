@@ -19,7 +19,7 @@
           <UserList :colors="availableColors" :participants="participants" @userClick="userClick" />
         </el-aside>
         <el-main>
-          <message-window :messageList="messages" @sendMessage="sendMessage" />
+          <message-window :messageList="currentDisplayMessages" @sendMessage="sendMessage" />
         </el-main>
       </el-container>
       <el-footer>Copyright © MBPSMARTEC株式会社 All rights reserved</el-footer>
@@ -73,7 +73,6 @@ export default {
   },
   mounted() {
     this.mmcUser = new ChatUser(this.mmc_uid,this.mmc_uid, InfoIcon);
-    
     this.currentUser = this.mmcUser;
     let chatUser = this.participants.find(u => u.id === this.mmcUser.id);
     if (!chatUser) {
@@ -104,7 +103,7 @@ export default {
       }
       return uid;
     },    
-    messages() {
+    currentDisplayMessages() {
       if (this.currentUser) {
         return this.currentUser.messageList;
       }
@@ -125,13 +124,12 @@ export default {
       let message = {
         type: "system",
         author: this.mmcUser.id,
-        text: this.mmcUser.name + "様がサーバに接続できました。"
+        text: this.mmcUser.id + "様がサーバに接続できました。"
       };
       console.log("onConnected====>", message);
-
-      this.title = "ようこそ、" + this.mmcUser.name + "様";
-      this.showMessage(message);
-      this.currentUser = this.mmcUser;
+      this.title = "ようこそ、" + this.mmcUser.id + "様";
+      let msg = new ChatMessage(message);
+      this.showMessage(msg);
     },
     onDisConnected: function() {
       this.chat_connected = false;
@@ -167,8 +165,7 @@ export default {
       console.log("sendMessage======:", msg);
       this.chatbot.send(msg);
     },
-    showMessage(message) {
-      let msg = new ChatMessage(message);
+    showMessage(msg) {
       let userid = this.getAuthor(msg);
       if (msg.isTranfering && msg.data.author) {
         userid = msg.data.author;
@@ -183,7 +180,7 @@ export default {
         userinfo.messageList = [];
       }
       userinfo.messageList.push(msg);
-      if (this.currentUser.id != userinfo.id) {
+      if (this.mmcUser.id != userinfo.id) {
         userinfo.newMessageCount++;
       }
     },
