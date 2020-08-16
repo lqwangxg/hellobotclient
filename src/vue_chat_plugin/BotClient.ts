@@ -102,9 +102,10 @@ class BotClient implements IBotClient{
     // Listen for messages received.
     that.socket.addEventListener("message", function(event: MessageEvent) {
       try {
-        var message = JSON.parse(event.data);
+        let message = JSON.parse(event.data);
+        console.log("addEventListener ==event.data=> ", event.data);
         message.received = true;
-        //console.log("addEventListener ==message=> ", message);
+        
         let msg = new ChatMessage(message);
         console.log("addEventListener ==msg=> ", msg);
         that.trigger(message.type, msg);

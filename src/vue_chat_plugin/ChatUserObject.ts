@@ -1,9 +1,10 @@
 import ChatMessage from "./ChatMessageObject";
 
 export default class ChatUser {
-  id: string;
-  username: string;
-  imageUrl: string; 
+  readonly id: string;
+  name: string;
+  imageUrl: string;
+
   realname?: string;
   nickname?: string;
   
@@ -16,11 +17,8 @@ export default class ChatUser {
 
   constructor(id: string , name?:string, imageUrl?:string){
     this.id = id;
-    this.username = name;
+    this.name = name;
     this.imageUrl = imageUrl;
-    this.mail ="";
-    this.telno ="";
-    this.imageUrl ="";
 
     this.messageList = [];
     this.newMessageCount = 0;
@@ -29,8 +27,7 @@ export default class ChatUser {
     this.ChatGroup = [];
   }
   
-  push(msg: ChatMessage){
+  push(msg: ChatMessage){    
     this.messageList.push(msg);
   }
-
 }

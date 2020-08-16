@@ -73,8 +73,8 @@ var BotClient = /** @class */ (function () {
         that.socket.addEventListener("message", function (event) {
             try {
                 var message = JSON.parse(event.data);
+                console.log("addEventListener ==event.data=> ", event.data);
                 message.received = true;
-                //console.log("addEventListener ==message=> ", message);
                 var msg = new ChatMessageObject_1["default"](message);
                 console.log("addEventListener ==msg=> ", msg);
                 that.trigger(message.type, msg);

@@ -94,10 +94,13 @@ export default {
   },
   computed: {
     messageText() {
-      if(!this.message.data || !this.message.data.text){
-        return "";
+      let text ="";
+      if(this.message.text){
+        text = this.message.text;
+      }else if(this.message.data && this.message.data.text){
+        text = this.message.data.text;
       }
-      let escaped = htmlEscape(this.message.data.text)
+      let escaped = htmlEscape(text)
 
       return Autolinker.link(this.messageStyling ? fmt(escaped) : escaped, {
         className: 'chatLink',

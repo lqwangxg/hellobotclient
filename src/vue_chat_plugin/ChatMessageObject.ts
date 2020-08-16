@@ -34,15 +34,16 @@ export default class ChatMessage {
   data?: MessageDataType;
   recipient?: string | string[];
   user_profile?: ChatUser;
-
-  constructor(msg: MessageDataType) {
+  
+  constructor(msg: any) {
     this.type = msg.type ? msg.type : "message";
     this.text = msg.text;
     this.received = msg.received ? msg.received : false;
     this.from = msg.from;
-
+    
     this.channel = msg.channel ? msg.channel : "socket";
     this.data = Object.assign({}, this.data, msg);
+    
     if(!msg.user){
       if(msg.author){
         this.user = msg.author;
