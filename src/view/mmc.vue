@@ -160,7 +160,10 @@ export default {
     sendMessage(message) {
       message.author = this.mmcUser.id;
       let msg = new ChatMessage(message);
-      this.messages.push(msg);
+      msg.from = msg.author;
+      msg.reply_user =this.currentUser.id;
+      //this.messages.push(msg);
+      this.showMessage(msg);
       msg.addChatGroup(this.currentUser.id);
       console.log("sendMessage======:", msg);
       this.chatbot.send(msg);
