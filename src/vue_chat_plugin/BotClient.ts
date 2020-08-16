@@ -1,19 +1,67 @@
-import ChatMessage  from "./ChatMessageObject";
-import ChatUser from "./ChatUserObject";
+import ChatMessageObject  from "./ChatMessageObject";
+import ChatUserObject from "./ChatUserObject";
 import { createLocalStorage } from "localstorage-ponyfill";
 
+/**
+ * Interface of BotClient. public methods:
+ * connect(userid:string, ws_url: string):void;
+ * connectWebsocket(ws_url: string):void;  
+ * connectWebhook()void;
+ * 
+ * on(event:string, handler: Function): void;
+ * trigger(event:string, details: object:) void;
+ * 
+ * request(url:string, body:object):void;
+ * send(message:ChatMessageObject, event:Event):void;
+ */
 interface IBotClient{
+  /**
+   * connect to server with userid and ws_url. 
+   * @param userid 
+   * @param ws_url 
+   */
   connect(userid:string, ws_url: string):void;
+  /**
+   * connect server by websocket.
+   * change http prefix to ws prefix. like http=>ws, https=>wss.
+   * @param ws_url 
+   */
   connectWebsocket(ws_url: string):void;
+  /**
+   * connect server by webhook.
+   */
   connectWebHook():void;
 
-  on(event: string, hander: Function);
-  trigger(event:string, details: object);
+  /**
+   * on open, close, send, receive, error, do something.
+   * @param event 
+   * @param hander 
+   */
+  on(event: string, hander: Function):void;
+  /**
+   * on trigger event coming.  
+   * @param event 
+   * @param details 
+   */
+  trigger(event:string, details: object):void;
   
-  request(url: string, body: object);
-  send(message: ChatMessage, event: Event);
+  /**
+   * request for receive response. 
+   * @param url 
+   * @param body 
+   */
+  request(url: string, body: object):void;
+  /**
+   * send message. if(event) event.preventDefault();
+   * @param message 
+   * @param event 
+   */
+  send(message: ChatMessageObject, event: Event):void;
 }
 
+/**
+ * connect options of BotClient.
+ */
 type Options = {
   ws_url:string,
   http_url?: string,
@@ -25,7 +73,13 @@ type Options = {
   element?: any,
 }
 
+/**
+ * Botclient.
+ */
 class BotClient implements IBotClient{
+  /**
+   * options of Botclient.
+   */
   options: Options = {
     ws_url : (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host,
     use_sockets: true,
@@ -34,12 +88,32 @@ class BotClient implements IBotClient{
     enable_history:false,
     userid: Math.random().toString().substr(2, 6),
   };
-  element: any = this.options.element;
-  reconnect_count: number = 0;
-  socket?: WebSocket;
-  localStorage= createLocalStorage();
-  user_profile?:ChatUser = null;
 
+  /**
+   * htmlElement for BotClient event handler. 
+   */
+  element: any = this.options.element;
+  /**
+   * try to reconnect count 
+   */
+  reconnect_count: number = 0;
+  /**
+   * socket of connect to server.
+   */
+  socket?: WebSocket;
+  /**
+   * localStorage for saving user info under.
+   */ 
+  localStorage= createLocalStorage();
+  /**
+   * BotClient user infomation.
+   */
+  user_profile?:ChatUserObject = null;
+
+  /**
+   * constructor of BotClient.
+   * @param options 
+   */
   constructor(options?: Options){
     Object.assign(this.options, options);
     if(this.options.http_url){
@@ -47,6 +121,11 @@ class BotClient implements IBotClient{
     }
   }
 
+  /**
+   * connect to server with userid and ws_url. 
+   * @param userid 
+   * @param http_url 
+   */
   connect(userid?: string, http_url?: string): void {
     if(userid){
       this.options.userid = userid;
@@ -66,15 +145,20 @@ class BotClient implements IBotClient{
     }
   }
 
+  /**
+   * connect to sever by websocket.
+   */
   connectWebsocket(): void {
     let that = this;
     that.socket = new WebSocket(that.options.ws_url);
 
-    //接続イベント
+    /**
+     * addEventListener for open connect event.
+     */
     that.socket.addEventListener("open", function(event: Event){
       console.log("CONNECTED TO SOCKET");
       that.reconnect_count = 0;
-      let msg = new ChatMessage({
+      let msg = new ChatMessageObject({
         type: "hello",
         user:  that.options.userid
       });      
@@ -106,7 +190,7 @@ class BotClient implements IBotClient{
         console.log("addEventListener ==event.data=> ", event.data);
         message.received = true;
         
-        let msg = new ChatMessage(message);
+        let msg = new ChatMessageObject(message);
         console.log("addEventListener ==msg=> ", msg);
         that.trigger(message.type, msg);
       } catch (err) {
@@ -120,7 +204,7 @@ class BotClient implements IBotClient{
   connectWebHook(): void {
     var that = this;
     var eventname = "hello";
-    var message = new ChatMessage({
+    var message = new ChatMessageObject({
       type: eventname,
       user: that.options.userid,
       channel:"webhook"
@@ -141,7 +225,7 @@ class BotClient implements IBotClient{
     this.element.$emit(event, details);
   }
 
-  request(url: string, body: ChatMessage) {
+  request(url: string, body: ChatMessageObject) {
     return new Promise(function(resolve, reject) {
       var xmlhttp = new XMLHttpRequest();
 
@@ -172,7 +256,7 @@ class BotClient implements IBotClient{
     });
   }
   
-  send(message: ChatMessage, event?: Event) {
+  send(message: ChatMessageObject, event?: Event) {
     let that = this;
     if(event) event.preventDefault();
 
@@ -185,13 +269,13 @@ class BotClient implements IBotClient{
     }
   }
   
-  webhook(message: ChatMessage) {
+  webhook(message: ChatMessageObject) {
     var that = this;
     that
     .request("/api/messages", message)
-    .then(function(messages:ChatMessage| Array<ChatMessage>) {
+    .then(function(messages:ChatMessageObject| Array<ChatMessageObject>) {
       if(Array.isArray(messages)){
-        messages.forEach((msg: ChatMessage) =>{
+        messages.forEach((msg: ChatMessageObject) =>{
           that.trigger(msg.type, msg);
         })
       }else{
@@ -203,7 +287,7 @@ class BotClient implements IBotClient{
     });
   }
 
-  trySendMessage(message: ChatMessage){
+  trySendMessage(message: ChatMessageObject){
     console.log("socket send message: ", message);
     if(this.socket.readyState === 1){
       this.socket.send(JSON.stringify(message));
@@ -213,12 +297,12 @@ class BotClient implements IBotClient{
     }
   }
   
-  getUserProfile(userid: string): ChatUser{
+  getUserProfile(userid: string): ChatUserObject{
     if(this.options.userid){
       //localStorageへ検索
       let userinfo = localStorage.getItem(this.options.userid);
       if(!userinfo){
-        let ui = new ChatUser(userid);
+        let ui = new ChatUserObject(userid);
         localStorage.setItem("userid", JSON.stringify(ui));
         return ui;
       }else{
@@ -226,7 +310,7 @@ class BotClient implements IBotClient{
       }
     }
 
-    return new ChatUser(userid);
+    return new ChatUserObject(userid);
   }
   //==============================================
   /**

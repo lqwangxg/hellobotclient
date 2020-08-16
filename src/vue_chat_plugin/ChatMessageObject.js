@@ -1,13 +1,13 @@
 "use strict";
 exports.__esModule = true;
-var ChatMessage = /** @class */ (function () {
-    function ChatMessage(msg) {
+var ChatMessageObject = /** @class */ (function () {
+    function ChatMessageObject(msg) {
         this.type = msg.type ? msg.type : "message";
         this.text = msg.text;
         this.received = msg.received ? msg.received : false;
         this.from = msg.from;
         this.channel = msg.channel ? msg.channel : "socket";
-        this.data = Object.assign({}, this.data, msg);
+        this.data = Object.assign({}, msg);
         if (!msg.user) {
             if (msg.author) {
                 this.user = msg.author;
@@ -38,6 +38,6 @@ var ChatMessage = /** @class */ (function () {
         }
         this.author = this.user;
     }
-    return ChatMessage;
+    return ChatMessageObject;
 }());
-exports["default"] = ChatMessage;
+exports["default"] = ChatMessageObject;

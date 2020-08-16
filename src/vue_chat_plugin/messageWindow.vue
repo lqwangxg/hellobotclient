@@ -10,7 +10,7 @@
       :show-edition="true"
       :show-deletion="true"
       :message-styling="false"
-      @scrollToTop="$emit('scrollToTop')"
+      @scrollToTop="$emit('scroll-to-top')"
       @remove="$emit('remove', $event)"
     >
       <template v-slot:user-avatar="scopedProps">
@@ -39,7 +39,7 @@
       :show-file="false"
       placeholder="input here please."
       :colors="availableColors"
-      @onType="$emit('onType')"
+      @onType="$emit('on-type')"
       @edit="$emit('edit', $event)"
     />
   </div>

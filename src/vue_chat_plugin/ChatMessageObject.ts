@@ -1,13 +1,24 @@
-import  ChatUser  from "./ChatUserObject";
+import  ChatUserObject  from "./ChatUserObject";
+
+/**
+ * message of quick_reply.
+ */
 type quick_reply={
   title:string,
   payload:string,
   content_type: "text"
 }
+
+/**
+ * message type of file.
+ */
 type fileType={
   name: string,
   url: string
 }
+/**
+ * 
+ */
 type MessageDataType = {
   type?: string,
   text?: string,
@@ -15,12 +26,11 @@ type MessageDataType = {
   user: string,
   quick_replies?:Array<quick_reply>,
   file?: fileType,
-  data?:{text?: string},
   author?:string,
   received?:boolean,
   from?:string
 }
-export default class ChatMessage {
+export default class ChatMessageObject {
   readonly type: string;
   readonly text: string;
   readonly user: string;
@@ -31,10 +41,10 @@ export default class ChatMessage {
   readonly file?: fileType;
   from?:string;
 
-  data?: MessageDataType;
   recipient?: string | string[];
-  user_profile?: ChatUser;
-  
+  user_profile?: ChatUserObject;
+  data?:MessageDataType;
+
   constructor(msg: any) {
     this.type = msg.type ? msg.type : "message";
     this.text = msg.text;
@@ -42,7 +52,7 @@ export default class ChatMessage {
     this.from = msg.from;
     
     this.channel = msg.channel ? msg.channel : "socket";
-    this.data = Object.assign({}, this.data, msg);
+    this.data = Object.assign({}, msg);
     
     if(!msg.user){
       if(msg.author){

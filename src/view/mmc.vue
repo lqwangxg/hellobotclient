@@ -1,6 +1,7 @@
 <template>
   <div id="messageCenter">
     <el-container style="height: 550px; border: 1px solid #eee">
+      
       <el-header>
         <el-row>
           <el-col :span="3" class="chat-header">
@@ -14,6 +15,7 @@
           </el-col>
         </el-row>
       </el-header>
+
       <el-container>
         <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
           <UserList :colors="availableColors" :participants="participants" @userClick="userClick" />
@@ -22,6 +24,7 @@
           <message-window :messageList="currentDisplayMessages" @sendMessage="sendMessage" />
         </el-main>
       </el-container>
+
       <el-footer>Copyright © MBPSMARTEC株式会社 All rights reserved</el-footer>
     </el-container>
   </div>
@@ -31,14 +34,11 @@
 import Colors from "../data/colors";
 import chatParticipants from "../data/chatProfiles";
 import UserList from "../vue_chat_plugin/UserList";
-import messageWindow from "../vue_chat_plugin/messageWindow";
+import MessageWindow from "../vue_chat_plugin/MessageWindow";
 import store from "../vue_chat_plugin/store/";
 import logoIcon from "../vue_chat_plugin/assets/logo.png";
 import GuestIcon from "../vue_chat_plugin/assets/guest.png";
 import InfoIcon from "../vue_chat_plugin/assets/information.png";
-//import client from "../vue_chat_plugin/client.js";
-//import ChatUser from "../vue_chat_plugin/ChatUser.js";
-//import ChatMessage from "../vue_chat_plugin/ChatMessage.js";
 import client from '../vue_chat_plugin/BotClient.js'
 import ChatUser from "../vue_chat_plugin/ChatUserObject.js";
 import ChatMessage from '../vue_chat_plugin/ChatMessageObject.js'
@@ -47,7 +47,7 @@ export default {
   name: "MessageCenter",
   components: {
     UserList,
-    messageWindow
+    MessageWindow
   },
   props: {
     ws_url:{
@@ -162,9 +162,8 @@ export default {
       let msg = new ChatMessage(message);
       msg.from = msg.author;
       msg.reply_user =this.currentUser.id;
-      //this.messages.push(msg);
+      
       this.showMessage(msg);
-      msg.addChatGroup(this.currentUser.id);
       console.log("sendMessage======:", msg);
       this.chatbot.send(msg);
     },

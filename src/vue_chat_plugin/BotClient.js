@@ -3,8 +3,18 @@ exports.__esModule = true;
 var ChatMessageObject_1 = require("./ChatMessageObject");
 var ChatUserObject_1 = require("./ChatUserObject");
 var localstorage_ponyfill_1 = require("localstorage-ponyfill");
+/**
+ * Botclient.
+ */
 var BotClient = /** @class */ (function () {
+    /**
+     * constructor of BotClient.
+     * @param options
+     */
     function BotClient(options) {
+        /**
+         * options of Botclient.
+         */
         this.options = {
             ws_url: (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host,
             use_sockets: true,
@@ -13,15 +23,32 @@ var BotClient = /** @class */ (function () {
             enable_history: false,
             userid: Math.random().toString().substr(2, 6)
         };
+        /**
+         * htmlElement for BotClient event handler.
+         */
         this.element = this.options.element;
+        /**
+         * try to reconnect count
+         */
         this.reconnect_count = 0;
+        /**
+         * localStorage for saving user info under.
+         */
         this.localStorage = localstorage_ponyfill_1.createLocalStorage();
+        /**
+         * BotClient user infomation.
+         */
         this.user_profile = null;
         Object.assign(this.options, options);
         if (this.options.http_url) {
             this.options.ws_url = this.options.http_url.replace("http", "ws");
         }
     }
+    /**
+     * connect to server with userid and ws_url.
+     * @param userid
+     * @param http_url
+     */
     BotClient.prototype.connect = function (userid, http_url) {
         if (userid) {
             this.options.userid = userid;
@@ -39,10 +66,15 @@ var BotClient = /** @class */ (function () {
             this.connectWebHook();
         }
     };
+    /**
+     * connect to sever by websocket.
+     */
     BotClient.prototype.connectWebsocket = function () {
         var that = this;
         that.socket = new WebSocket(that.options.ws_url);
-        //接続イベント
+        /**
+         * addEventListener for open connect event.
+         */
         that.socket.addEventListener("open", function (event) {
             console.log("CONNECTED TO SOCKET");
             that.reconnect_count = 0;
