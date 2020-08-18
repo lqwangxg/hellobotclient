@@ -155,6 +155,7 @@ export default {
     sendMessage(message) {
       this.messageList = [...this.messageList, Object.assign({}, message)]
       console.log("sendMessage from User=====:", message);
+      message.user = this.store.currentUser.id;
       let msg = new ChatMessage(message); 
       this.chatbot.send(msg);
     },

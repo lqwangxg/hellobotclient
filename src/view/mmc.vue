@@ -166,13 +166,12 @@ export default {
       this.showMessage(message);
     },
     sendMessage(message) {
-      message.author = this.mmcUser.id;
+      message.user = this.mmcUser.id;
       let msg = new ChatMessage(message);
-      msg.from = msg.author;
       msg.reply_user =this.currentUser.id;
-      
-      this.showMessage(msg);
+
       console.log("sendMessage======:", msg);
+      this.showMessage(msg);
       this.chatbot.send(msg);
     },
     showMessage(msg) {

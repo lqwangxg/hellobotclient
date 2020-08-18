@@ -29,6 +29,12 @@ var ChatMessageObject = /** @class */ (function () {
             this.user = "bot";
             this.author = "bot";
         }
+        if (msg.recipient) {
+            this.recipient = msg.recipient;
+        }
+        else {
+            this.recipient = "bot";
+        }
         if (msg.file) {
             this.file = msg.file;
         }

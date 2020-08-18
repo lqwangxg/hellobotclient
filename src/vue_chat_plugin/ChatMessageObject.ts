@@ -41,6 +41,7 @@ export default class ChatMessageObject {
   
   user_profile?: ChatUserObject;
   data?:{text:string};
+  recipient?:string;
 
   constructor(msg: any) {
     this.type = msg.type ? msg.type : "message";
@@ -68,6 +69,11 @@ export default class ChatMessageObject {
       this.user = "bot";
       this.author ="bot";
     }    
+    if(msg.recipient){
+      this.recipient = msg.recipient;
+    }else{
+      this.recipient ="bot";
+    }
     
     if(msg.file){
       this.file = msg.file;
