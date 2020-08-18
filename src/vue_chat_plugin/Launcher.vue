@@ -33,8 +33,8 @@
       :always-scroll-to-bottom="alwaysScrollToBottom"
       :message-styling="messageStyling"
       :disable-user-list-toggle="disableUserListToggle"
-      @scrollToTop="$emit('scrollToTop')"
-      @onType="$emit('onType')"
+      @scrollToTop="$emit('scroll-to-top')"
+      @onType="$emit('on-type')"
       @edit="$emit('edit', $event)"
       @remove="$emit('remove', $event)"
     >

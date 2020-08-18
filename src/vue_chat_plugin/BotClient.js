@@ -76,11 +76,12 @@ var BotClient = /** @class */ (function () {
          * addEventListener for open connect event.
          */
         that.socket.addEventListener("open", function (event) {
-            console.log("CONNECTED TO SOCKET");
+            console.log("CONNECTED TO SERVER BY SOCKET");
             that.reconnect_count = 0;
             var msg = new ChatMessageObject_1["default"]({
                 type: "hello",
-                user: that.options.userid
+                user: that.options.userid,
+                text: "CONNECTED TO SERVER BY SOCKET"
             });
             that.send(msg, event);
             that.trigger("connected", msg);
@@ -110,6 +111,13 @@ var BotClient = /** @class */ (function () {
                 var msg = new ChatMessageObject_1["default"](message);
                 console.log("addEventListener ==msg=> ", msg);
                 that.trigger(message.type, msg);
+                var msgArray = [];
+                var messageList = localStorage.getItem("messageList");
+                if (messageList) {
+                    msgArray = JSON.parse(messageList);
+                }
+                msgArray.push(msg);
+                localStorage.setItem("messageList", JSON.stringify(msgArray));
             }
             catch (err) {
                 that.trigger("socket_error", err);
@@ -173,13 +181,23 @@ var BotClient = /** @class */ (function () {
         var that = this;
         if (event)
             event.preventDefault();
-        message.from = message.author;
         message.user_profile = that.getUserProfile(message.author);
         if (that.options.use_sockets) {
             that.trySendMessage(message);
         }
         else {
             that.webhook(message);
+        }
+    };
+    BotClient.prototype.trySendMessage = function (message) {
+        var that = this;
+        console.log("socket send message: ", message);
+        if (that.socket.readyState === 1) {
+            that.socket.send(JSON.stringify(message));
+            return true;
+        }
+        else {
+            setTimeout(that.trySendMessage, 100, message);
         }
     };
     BotClient.prototype.webhook = function (message) {
@@ -198,16 +216,6 @@ var BotClient = /** @class */ (function () {
         })["catch"](function (err) {
             that.trigger("webhook_error", err);
         });
-    };
-    BotClient.prototype.trySendMessage = function (message) {
-        console.log("socket send message: ", message);
-        if (this.socket.readyState === 1) {
-            this.socket.send(JSON.stringify(message));
-            return true;
-        }
-        else {
-            setTimeout(this.trySendMessage, 100, message);
-        }
     };
     BotClient.prototype.getUserProfile = function (userid) {
         if (this.options.userid) {

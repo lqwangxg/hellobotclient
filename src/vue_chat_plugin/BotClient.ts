@@ -156,14 +156,15 @@ class BotClient implements IBotClient{
      * addEventListener for open connect event.
      */
     that.socket.addEventListener("open", function(event: Event){
-      console.log("CONNECTED TO SOCKET");
+      console.log("CONNECTED TO SERVER BY SOCKET");
       that.reconnect_count = 0;
       let msg = new ChatMessageObject({
         type: "hello",
-        user:  that.options.userid
+        user:  that.options.userid,
+        text: "CONNECTED TO SERVER BY SOCKET" 
       });      
       that.send(msg, event);
-      that.trigger("connected", msg);      
+      that.trigger("connected", msg); 
     });
 
     that.socket.addEventListener("error", function(event: Event){
@@ -193,6 +194,13 @@ class BotClient implements IBotClient{
         let msg = new ChatMessageObject(message);
         console.log("addEventListener ==msg=> ", msg);
         that.trigger(message.type, msg);
+        let msgArray:Array<ChatMessageObject> = []; 
+        let messageList = localStorage.getItem("messageList");
+        if(messageList){
+          msgArray = JSON.parse(messageList);
+        }
+        msgArray.push(msg);
+        localStorage.setItem("messageList", JSON.stringify(msgArray));
       } catch (err) {
         that.trigger("socket_error", err);
         return;
@@ -260,7 +268,6 @@ class BotClient implements IBotClient{
     let that = this;
     if(event) event.preventDefault();
 
-    message.from =message.author;
     message.user_profile = that.getUserProfile(message.author);
     if (that.options.use_sockets) {
       that.trySendMessage(message);
@@ -269,6 +276,17 @@ class BotClient implements IBotClient{
     }
   }
   
+  trySendMessage(message: ChatMessageObject){
+    let that = this;
+    console.log("socket send message: ", message);
+    if(that.socket.readyState === 1){
+      that.socket.send(JSON.stringify(message));
+      return true;
+    }else{
+      setTimeout(that.trySendMessage, 100, message);
+    }
+  }
+
   webhook(message: ChatMessageObject) {
     var that = this;
     that
@@ -285,16 +303,6 @@ class BotClient implements IBotClient{
     .catch(function(err) {
       that.trigger("webhook_error", err);
     });
-  }
-
-  trySendMessage(message: ChatMessageObject){
-    console.log("socket send message: ", message);
-    if(this.socket.readyState === 1){
-      this.socket.send(JSON.stringify(message));
-      return true;
-    }else{
-      setTimeout(this.trySendMessage, 100, message);
-    }
   }
   
   getUserProfile(userid: string): ChatUserObject{

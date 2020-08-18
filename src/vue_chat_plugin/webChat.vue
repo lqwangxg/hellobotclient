@@ -47,7 +47,6 @@
 <script>
 import Launcher from './Launcher.vue'
 import client from './BotClient.js'
-//import client from './client.js'
 import ChatMessage from './ChatMessageObject.js'
 import logoIcon from "./assets/logo.png";
 import store from './store/'

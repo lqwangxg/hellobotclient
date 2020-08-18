@@ -21,7 +21,11 @@
           <UserList :colors="availableColors" :participants="participants" @userClick="userClick" />
         </el-aside>
         <el-main>
-          <message-window :messageList="currentDisplayMessages" @sendMessage="sendMessage" />
+          <el-tabs v-model="activeTabName" type="card"  @tab-click="handleTabsEdit">
+            <el-tab-pane  v-for="user in guests" :key="user.id" :label="user.id" :name="user.name">
+              <message-window :messageList="messageList" @sendMessage="sendMessage" />
+            </el-tab-pane>
+          </el-tabs>
         </el-main>
       </el-container>
 
@@ -61,6 +65,7 @@ export default {
     return {
       store,
       participants: chatParticipants,
+      guests:null,
       availableColors: Colors.blue,
       chatbot: client,
       title: "",
@@ -68,10 +73,15 @@ export default {
       currentUser: null,
       titleImageUrl: logoIcon,
       guestImageUrl: GuestIcon,
-      mmcImageUrl: InfoIcon
+      mmcImageUrl: InfoIcon,
+      messageList: [],
+      activeTabName:""
     };
   },
   mounted() {
+    
+    this.guests=this.participants.filter(user=>!user.hidden);
+    this.activeTabName = this.mmc_uid;
     this.mmcUser = new ChatUser(this.mmc_uid,this.mmc_uid, InfoIcon);
     this.currentUser = this.mmcUser;
     let chatUser = this.participants.find(u => u.id === this.mmcUser.id);
@@ -104,21 +114,19 @@ export default {
       return uid;
     },    
     currentDisplayMessages() {
-      if (this.currentUser) {
-        return this.currentUser.messageList;
-      }
-      if(this.mmcUser){
-        return this.mmcUser.messageList;
-      }
-      return [];
+      return this.messageList;
     }
+  
   },
   methods: {
     userClick(chatUser) {
       this.currentUser = this.participants.find(u => u.id === chatUser.id);
       this.title = "ようこそ、" + this.currentUser.name + "様";
     },
-
+    
+    handleTabsEdit() {
+        
+    },
     onConnected: function() {
       this.chat_connected = true;
       let message = {
@@ -178,13 +186,14 @@ export default {
         userinfo = new ChatUser(userid, userid, this.guestImageUrl);
         this.participants.push(userinfo);
       }
-      if (!userinfo.messageList) {
-        userinfo.messageList = [];
-      }
-      userinfo.messageList.push(msg);
-      if (this.mmcUser.id != userinfo.id) {
-        userinfo.newMessageCount++;
-      }
+      this.messageList.push(msg);
+      // if (!userinfo.messageList) {
+      //   userinfo.messageList = [];
+      // }
+      // userinfo.messageList.push(msg);
+      // if (this.mmcUser.id != userinfo.id) {
+      //   userinfo.newMessageCount++;
+      // }
     },
     getAuthor(msg) {
       if (msg.reply_user && msg.reply_user != "bot") return msg.reply_user;
