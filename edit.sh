@@ -11,5 +11,6 @@ echo "app_name root path:$app_name"
 
 docker run -it --rm \
 -v $app_name:/app \
+-v ~/npm/:/root/.npm/ \
 lqwangxg/vue-cli \
 $sh_cmd

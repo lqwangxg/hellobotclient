@@ -37,6 +37,7 @@ echo "STEP2: CHECK BUILD CONTAINER, IF NOT FOUND, START A NEW ONE."
   docker run -it --rm --name $container_name \
     -w /app \
     -v $app_name:/app \
+    -v ~/npm/:/root/.npm/ \
     $builder_name \
     npm run build
   echo "npm run build completed."
