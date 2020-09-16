@@ -29,6 +29,7 @@
     "line-login": "^1.0.14",
     "localstorage-ponyfill": "^1.0.2",
     "msgdown": "^1.0.2",
+    "sass-loader": "^10.0.2",
     "showdown": "^1.9.1",
     "v-tooltip": "^2.0.1",
     "vue": "^2.6.11",
